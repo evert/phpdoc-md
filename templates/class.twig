@@ -1,0 +1,71 @@
+{{ className }}
+===============
+
+{{ description }}
+
+{{ longDescription|raw }}
+
+{% if isClass %}
+
+* Class name: {{ shortClass }}
+* Namespace: {{ namespace }}
+{% if abstract %}* This is an **abstract** class
+{% endif %}
+{% if extends[0] %}* Parent class: {{ extends.0|classLink }}
+{% endif %}
+{% if implements %}* This class implements: {% for interface in implements %}{{ interface|classLink }}{%if not loop.last %}, {% endif %}{% endfor %}
+{% endif %}
+{% if deprecated %}* **Warning:** this class is **deprecated**. This means that this class will likely be removed in a future version.
+{% endif %}
+
+{% endif %}
+
+{% if isInterface %}
+* Interface name: {{ shortClass }}
+* Namespace: {{ namespace }}
+* This is an **interface**
+{% if extends %}* This interface extends: {% for interface in extends %}{{ interface|classLink }}{%if not loop.last %}, {% endif %}{% endfor %}
+{% endif %}
+{% if deprecated %}* **Warning:** this interface is **deprecated**. This means that this interface will likely be removed in a future version.
+{% endif %}
+
+{% endif %}
+
+
+Methods
+-------
+
+{% if not methods %}
+This class defines no methods
+{% endif %}
+
+{% for method in methods %}
+
+### {{ method.name }} 
+
+```
+{{ method.signature }}
+```
+
+{{ method.description|raw }}
+
+{% if method.arguments %}
+#### Arguments
+
+<table>
+{% for argument in method.arguments %}
+
+  <tr>
+     <td>{{ argument.name }}</td>
+     <td>{% if argument.type %}{{ argument.type|classLink }}{% else %}mixed{% endif %}</td>
+     {% if argument.description %}<td>{{ argument.description }}</td>{% endif %}
+
+  </tr>
+
+{% endfor %}
+
+</table>
+
+{% endif %}
+
+{% endfor %}
