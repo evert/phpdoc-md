@@ -1,0 +1,164 @@
+#!/usr/bin/env php
+<?php
+
+// Potential composer autoloader paths
+$paths = array(
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+);
+
+foreach($paths as $path) {
+
+    if (file_exists($path)) {
+        include $path;
+        break;
+    }
+
+}
+
+if ($argc < 3) {
+    echo <<<HI
+PHPDocumentor Markdown Generator
+
+Usage:
+
+    # First generate a structure.xml file with phpdocumentor.
+    # This command will generate structure.xml in the current directory.
+    phpdoc parse -t . -d [project path] 
+    
+    # Next, run phpdocmd:
+    {$argv[0]} structure.xml [outputdir]
+
+HI;
+    die();
+}
+
+$input = $argv[1];
+$outputDir = $argv[2];
+
+$xml = simplexml_load_file($input);
+
+$classNames = array();
+
+foreach($xml->xpath('file/class|file/interface') as $class) {
+
+    $className = (string)$class->full_name;
+    $className = ltrim($className,'\\');
+
+    $fileName = str_replace('\\','-', $className) . '.md';
+
+    $implements = array();
+
+    foreach($class->implements as $interface) {
+        
+        $implements[] = ltrim((string)$interface, '\\');
+
+    } 
+
+    $extends = array();
+    foreach($class->extends as $parent) {
+        
+        $extends[] = ltrim((string)$parent, '\\');
+
+    }
+
+    $methods = array();
+    foreach($class->method as $method) {
+
+        $methodName = $method->full_name;
+
+        $return = $method->xpath('docblock/tag[@name="return"]');
+        if (count($return)) {
+            $return = (string)$return[0]['type'];
+        } else {
+            $return = 'mixed';
+        } 
+
+        $arguments = array();
+
+        foreach($method->argument as $argument) {
+
+            $nArgument = array(
+                'type' => (string)$argument->type,
+                'name' => (string)$argument->name
+            );
+            if (count($tag = $method->xpath('docblock/tag[@name="param" and @variable="' . $nArgument['name'] . '"]'))) {
+
+                $tag = $tag[0];
+                if ((string)$tag['type']) {
+                    $nArgument['type'] = (string)$tag['type'];
+                }
+                if ((string)$tag['description']) {
+                    $nArgument['description'] = (string)$tag['description'];
+                }
+                if ((string)$tag['variable']) {
+                    $nArgument['name'] = (string)$tag['variable'];
+                }
+
+            }
+
+            $arguments[] = $nArgument;
+
+        }
+
+        $argumentStr = implode(', ', array_map(function($argument) {
+            return ($argument['type']?$argument['type'] . ' ':'') . $argument['name'];
+        }, $arguments));
+
+        $signature = $return . ' ' . $className . '::' . $methodName . '('.$argumentStr.')';
+
+        $methods[] = array(
+            'name' => $methodName,
+            'description' => (string)$method->docblock->description . "\n\n" . (string)$method->docblock->{"long-description"},
+            'signature' => $signature,
+            'arguments' => $arguments
+        );      
+
+    } 
+
+    $classNames[$className] = array(
+        'fileName' => $fileName,
+        'className' => $className,
+        'shortClass' => (string)$class->name,
+        'namespace' => (string)$class['namespace'],
+        'description' => (string)$class->docblock->description,
+        'longDescription' => (string)$class->docblock->{"long-description"},
+        'implements' => $implements,
+        'extends' => $extends,
+        'isClass' => $class->getName()==='class',
+        'isInterface' => $class->getName()==='interface',
+        'abstract' => (string)$class['abstract']=='true',
+        'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
+        'methods' => $methods
+    );
+
+}
+
+
+$loader = new Twig_Loader_String();
+$twig = new Twig_Environment($loader);
+$twig->addFilter('classLink', new Twig_Filter_Function('classLink'));
+
+foreach($classNames as $className=>$data) {
+
+    $output = $twig->render(file_get_contents(__DIR__ . '/../templates/class.twig'),
+        $data
+    );
+    file_put_contents($outputDir . '/' . $data['fileName'], $output);
+
+}
+
+
+function classLink($className) {
+
+    global $classNames;
+    
+    $className = ltrim($className,'\\');
+
+    if (!isset($classNames[$className])) {
+        return $className;
+    }
+
+    return "[" . $className . "](" . str_replace('\\', '-', $className) . ')'; 
+
+}
