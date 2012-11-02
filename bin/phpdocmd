@@ -65,7 +65,7 @@ foreach($xml->xpath('file/class|file/interface') as $class) {
     $methods = array();
     foreach($class->method as $method) {
 
-        $methodName = $method->full_name;
+        $methodName = (string)$method->full_name;
 
         $return = $method->xpath('docblock/tag[@name="return"]');
         if (count($return)) {
@@ -107,7 +107,7 @@ foreach($xml->xpath('file/class|file/interface') as $class) {
 
         $signature = $return . ' ' . $className . '::' . $methodName . '('.$argumentStr.')';
 
-        $methods[] = array(
+        $methods[$methodName] = array(
             'name' => $methodName,
             'description' => (string)$method->docblock->description . "\n\n" . (string)$method->docblock->{"long-description"},
             'signature' => $signature,
@@ -131,6 +131,57 @@ foreach($xml->xpath('file/class|file/interface') as $class) {
         'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
         'methods' => $methods
     );
+
+}
+
+function expandMethods($class) {
+
+    global $classNames;
+
+    $newMethods = array();
+    foreach($class['implements'] as $implements) {
+
+        if (!isset($classNames[$implements])) {
+            continue;
+        }
+
+        foreach($classNames[$implements]['methods'] as $methodName => $methodInfo) {
+
+            if (!isset($class[$methodName])) {
+                $newMethods[$methodName] = $methodInfo;
+            }
+
+        }
+
+        $newMethods = array_merge($newMethods, expandMethods($classNames[$implements]));
+
+    }
+    foreach($class['extends'] as $extends) {
+
+        if (!isset($classNames[$extends])) {
+            continue;
+        }
+
+        foreach($classNames[$extends]['methods'] as $methodName => $methodInfo) {
+
+            if (!isset($class[$methodName])) {
+                $newMethods[$methodName] = $methodInfo;
+            }
+
+        }
+
+        $newMethods = array_merge($newMethods, expandMethods($classNames[$extends]));
+
+    }
+
+
+    return $newMethods;
+
+}
+
+foreach($classNames as $k=>$class) {
+
+    $classNames[$k]['methods'] = array_merge($class['methods'], expandMethods($class));
 
 }
 
