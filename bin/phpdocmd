@@ -24,8 +24,8 @@ Usage:
 
     # First generate a structure.xml file with phpdocumentor.
     # This command will generate structure.xml in the current directory.
-    phpdoc parse -t . -d [project path] 
-    
+    phpdoc parse -t . -d [project path]
+
     # Next, run phpdocmd:
     {$argv[0]} structure.xml [outputdir]
 
@@ -50,14 +50,14 @@ foreach($xml->xpath('file/class|file/interface') as $class) {
     $implements = array();
 
     foreach($class->implements as $interface) {
-        
+
         $implements[] = ltrim((string)$interface, '\\');
 
-    } 
+    }
 
     $extends = array();
     foreach($class->extends as $parent) {
-        
+
         $extends[] = ltrim((string)$parent, '\\');
 
     }
@@ -72,7 +72,7 @@ foreach($xml->xpath('file/class|file/interface') as $class) {
             $return = (string)$return[0]['type'];
         } else {
             $return = 'mixed';
-        } 
+        }
 
         $arguments = array();
 
@@ -112,9 +112,9 @@ foreach($xml->xpath('file/class|file/interface') as $class) {
             'description' => (string)$method->docblock->description . "\n\n" . (string)$method->docblock->{"long-description"},
             'signature' => $signature,
             'arguments' => $arguments
-        );      
+        );
 
-    } 
+    }
 
     $classNames[$className] = array(
         'fileName' => $fileName,
@@ -203,13 +203,31 @@ foreach($classNames as $className=>$data) {
 function classLink($className) {
 
     global $classNames;
-    
-    $className = ltrim($className,'\\');
 
-    if (!isset($classNames[$className])) {
-        return $className;
+    $returnedClasses = array();
+
+    foreach(explode('|', $className) as $oneClass) {
+
+        $oneClass = trim($oneClass,'\\ ');
+
+        if (!isset($classNames[$oneClass])) {
+
+            /*
+            $known = array('string', 'bool', 'array', 'int', 'mixed', 'resource', 'DOMNode', 'DOMDocument', 'DOMElement', 'PDO', 'callback', 'null', 'Exception', 'integer', 'DateTime');
+            if (!in_array($oneClass, $known)) {
+                file_put_contents('/tmp/classnotfound',$oneClass . "\n", FILE_APPEND);
+            }*/
+
+            $returnedClasses[] = $oneClass;
+
+        } else {
+
+            $returnedClasses[] = "[" . $oneClass . "](" . str_replace('\\', '-', $oneClass) . ')';
+
+        }
+
     }
 
-    return "[" . $className . "](" . str_replace('\\', '-', $className) . ')'; 
+   return implode('|', $returnedClasses);
 
 }
