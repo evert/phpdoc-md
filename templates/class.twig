@@ -71,7 +71,7 @@ Properties
 {% endif %}
 {% if property.static %}* This property is **static**.
 {% endif %}
-{% if property.definedBy != className %}* This property is defined by {{ property.definedBy }}
+{% if property.definedBy != className %}* This property is defined by {{ property.definedBy|classLink }}
 {% endif %}
 
 {% endfor %}
@@ -98,7 +98,7 @@ Methods
 {% endif %}
 {% if method.deprecated %}* **Warning:** this method is **deprecated**. This means that this method will likely be removed in a future version.
 {% endif %}
-{% if method.definedBy != className %}* This method is defined by {{ method.definedBy }}
+{% if method.definedBy != className %}* This method is defined by {{ method.definedBy|classLink }}
 {% endif %}
 
 {% if method.arguments %}
