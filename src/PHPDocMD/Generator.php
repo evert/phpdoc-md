@@ -127,7 +127,7 @@ class Generator
             foreach($item as $name=>$subItems) {
 
                 $fullName = $fullString?$fullString."\\".$name:$name;
-                $output.= str_repeat('  ', $depth) . '* ' . Generator::classLink($fullName, $name) . "\n";
+                $output.= str_repeat(' ', $depth*4) . '* ' . Generator::classLink($fullName, $name) . "\n";
                 $output.= $treeOutput($subItems, $fullName, $depth+1);
 
             }
