@@ -31,6 +31,24 @@
 
 {% endif %}
 
+Properties
+----------
+
+{% if not properties %}
+This class defines no properties
+{% endif %}
+
+{% for property in properties %}
+
+### {{ property.name }}
+
+```
+{{ property.signature }}
+```
+
+{{ property.description|raw }}
+
+{% endfor %}
 
 Methods
 -------
@@ -41,7 +59,7 @@ This class defines no methods
 
 {% for method in methods %}
 
-### {{ method.name }} 
+### {{ method.name }}
 
 ```
 {{ method.signature }}
