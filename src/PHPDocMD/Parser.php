@@ -2,6 +2,8 @@
 
 namespace PHPDocMD;
 
+use SimpleXMLElement;
+
 /**
  * This class parses structure.xml and generates the api documentation.
  *
@@ -72,10 +74,10 @@ class Parser
      * Gets all classes and interfaces from the file and puts them in an easy
      * to use array.
      *
-     * @param \SimpleXmlElement $xml
+     * @param SimpleXmlElement $xml
      * @return void
      */
-    protected function getClassDefinitions(\SimpleXmlElement $xml) {
+    protected function getClassDefinitions(SimpleXmlElement $xml) {
 
         foreach($xml->xpath('file/class|file/interface') as $class) {
 
@@ -99,60 +101,6 @@ class Parser
 
             }
 
-            $methods = array();
-            foreach($class->method as $method) {
-
-                $methodName = (string)$method->full_name;
-
-                $return = $method->xpath('docblock/tag[@name="return"]');
-                if (count($return)) {
-                    $return = (string)$return[0]['type'];
-                } else {
-                    $return = 'mixed';
-                }
-
-                $arguments = array();
-
-                foreach($method->argument as $argument) {
-
-                    $nArgument = array(
-                        'type' => (string)$argument->type,
-                        'name' => (string)$argument->name
-                    );
-                    if (count($tag = $method->xpath('docblock/tag[@name="param" and @variable="' . $nArgument['name'] . '"]'))) {
-
-                        $tag = $tag[0];
-                        if ((string)$tag['type']) {
-                            $nArgument['type'] = (string)$tag['type'];
-                        }
-                        if ((string)$tag['description']) {
-                            $nArgument['description'] = (string)$tag['description'];
-                        }
-                        if ((string)$tag['variable']) {
-                            $nArgument['name'] = (string)$tag['variable'];
-                        }
-
-                    }
-
-                    $arguments[] = $nArgument;
-
-                }
-
-                $argumentStr = implode(', ', array_map(function($argument) {
-                    return ($argument['type']?$argument['type'] . ' ':'') . $argument['name'];
-                }, $arguments));
-
-                $signature = $return . ' ' . $className . '::' . $methodName . '('.$argumentStr.')';
-
-                $methods[$methodName] = array(
-                    'name' => $methodName,
-                    'description' => (string)$method->docblock->description . "\n\n" . (string)$method->docblock->{"long-description"},
-                    'signature' => $signature,
-                    'arguments' => $arguments
-                );
-
-            }
-
             $classNames[$className] = array(
                 'fileName' => $fileName,
                 'className' => $className,
@@ -166,12 +114,128 @@ class Parser
                 'isInterface' => $class->getName()==='interface',
                 'abstract' => (string)$class['abstract']=='true',
                 'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
-                'methods' => $methods
+                'methods' => $this->parseMethods($class),
+                'properties' => $this->parseProperties($class),
             );
 
         }
 
         $this->classDefinitions = $classNames;
+
+    }
+
+    /**
+     * Parses all the method information for a single class or interface. 
+     *
+     * You must pass an xml element that refers to either the class or
+     * interface element from structure.xml.
+     *
+     * @param SimpleXMLElement $class
+     * @return array 
+     */
+    protected function parseMethods(SimpleXMLElement $class) {
+
+        $methods = array();
+
+        $className = (string)$class->full_name;
+        $className = ltrim($className,'\\');
+
+        foreach($class->method as $method) {
+
+            $methodName = (string)$method->full_name;
+
+            $return = $method->xpath('docblock/tag[@name="return"]');
+            if (count($return)) {
+                $return = (string)$return[0]['type'];
+            } else {
+                $return = 'mixed';
+            }
+
+            $arguments = array();
+
+            foreach($method->argument as $argument) {
+
+                $nArgument = array(
+                    'type' => (string)$argument->type,
+                    'name' => (string)$argument->name
+                );
+                if (count($tag = $method->xpath('docblock/tag[@name="param" and @variable="' . $nArgument['name'] . '"]'))) {
+
+                    $tag = $tag[0];
+                    if ((string)$tag['type']) {
+                        $nArgument['type'] = (string)$tag['type'];
+                    }
+                    if ((string)$tag['description']) {
+                        $nArgument['description'] = (string)$tag['description'];
+                    }
+                    if ((string)$tag['variable']) {
+                        $nArgument['name'] = (string)$tag['variable'];
+                    }
+
+                }
+
+                $arguments[] = $nArgument;
+
+            }
+
+            $argumentStr = implode(', ', array_map(function($argument) {
+                return ($argument['type']?$argument['type'] . ' ':'') . $argument['name'];
+            }, $arguments));
+
+            $signature = $return . ' ' . $className . '::' . $methodName . '('.$argumentStr.')';
+
+            $methods[$methodName] = array(
+                'name' => $methodName,
+                'description' => (string)$method->docblock->description . "\n\n" . (string)$method->docblock->{"long-description"},
+                'signature' => $signature,
+                'visibility' => (string)$method['visibility'],
+                'arguments' => $arguments
+            );
+
+        }
+        return $methods;
+
+    }
+
+    /**
+     * Parses all property information for a single class or interface. 
+     *
+     * You must pass an xml element that refers to either the class or
+     * interface element from structure.xml.
+     *
+     * @param SimpleXMLElement $class
+     * @return array 
+     */
+    protected function parseProperties(SimpleXMLElement $class) {
+
+        $properties = array();
+
+        $className = (string)$class->full_name;
+        $className = ltrim($className,'\\');
+
+        foreach($class->property as $xProperty) {
+
+            $type = 'mixed';
+            $propName = (string)$xProperty->name;
+            $xVar = $xProperty->xpath('docblock/tag[@name="var"]');
+            if (count($xVar)) {
+                $type = $xVar[0]->type;
+            }
+
+            $visibility = (string)$xProperty['visbility'];
+
+            $signature = $visibility . ' ' . $type . ' ' . $propName;
+
+            $properties[$propName] = array(
+                'name' => $propName,
+                'type' => $type,
+                'description' => (string)$xProperty->docblock->description . "\n\n" . (string)$xProperty->docblock->{"long-description"},
+                'visibility' => $visibility,
+                'signature' => $signature,
+            );
+
+        }
+        return $properties;
 
     }
 

@@ -38,54 +38,14 @@ $outputDir = $argv[2];
 
 
 $parser = new PHPDocMD\Parser(
-    $input,
-    $outputDir
+    $input
 );
 $classDefinitions = $parser->run();
 
 
-$loader = new Twig_Loader_String();
-$twig = new Twig_Environment($loader);
-$twig->addFilter('classLink', new Twig_Filter_Function('classLink'));
-
-foreach($classDefinitions as $className=>$data) {
-
-    $output = $twig->render(file_get_contents(__DIR__ . '/../templates/class.twig'),
-        $data
-    );
-    file_put_contents($outputDir . '/' . $data['fileName'], $output);
-
-}
+$generator = new PHPDocMD\Generator(
+    $classDefinitions,
+    $outputDir
+);
 
 
-function classLink($className) {
-
-    global $classDefinitions;
-
-    $returnedClasses = array();
-
-    foreach(explode('|', $className) as $oneClass) {
-
-        $oneClass = trim($oneClass,'\\ ');
-
-        if (!isset($classDefinitions[$oneClass])) {
-
-            /*
-            $known = array('string', 'bool', 'array', 'int', 'mixed', 'resource', 'DOMNode', 'DOMDocument', 'DOMElement', 'PDO', 'callback', 'null', 'Exception', 'integer', 'DateTime');
-            if (!in_array($oneClass, $known)) {
-                file_put_contents('/tmp/classnotfound',$oneClass . "\n", FILE_APPEND);
-            }*/
-
-            $returnedClasses[] = $oneClass;
-
-        } else {
-
-            $returnedClasses[] = "[" . $oneClass . "](" . str_replace('\\', '-', $oneClass) . ')';
-
-        }
-
-    }
-
-   return implode('|', $returnedClasses);
-
-}
