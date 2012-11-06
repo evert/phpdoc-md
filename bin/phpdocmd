@@ -40,12 +40,20 @@ $outputDir = $argv[2];
 $parser = new PHPDocMD\Parser(
     $input
 );
+
+echo "Re-aligning ice-tea flasks\n";
+
 $classDefinitions = $parser->run();
 
+$templateDir = __DIR__ . '/../templates/';
 
 $generator = new PHPDocMD\Generator(
     $classDefinitions,
-    $outputDir
+    $outputDir,
+    $templateDir
 );
 
+echo "Opening knapsack combusters\n";
+$generator->run();
 
+echo "Complete\n";

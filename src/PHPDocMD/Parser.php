@@ -22,13 +22,6 @@ class Parser
     protected $structureXmlFile;
 
     /**
-     * Output directory
-     *
-     * @var string
-     */
-    protected $outputDir;
-
-    /**
      * The list of classes and interfaces
      *
      * @var array
@@ -39,13 +32,11 @@ class Parser
      * Constructor
      *
      * @param string $structureXmlFile
-     * @param string $outputDir
      */
-    public function __construct($structureXmlFile, $outputDir)
+    public function __construct($structureXmlFile)
     {
 
         $this->structureXmlFile = $structureXmlFile;
-        $this->outputDir = $outputDir;
 
     }
 

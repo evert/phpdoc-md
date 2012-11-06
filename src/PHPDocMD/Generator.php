@@ -4,7 +4,9 @@ namespace PHPDocMD;
 
 use
     Twig_Loader_String,
-    Twig_Environment;
+    Twig_Environment,
+    Twig_Filter_Function;
+
 
 /**
  * This class takes the output from 'parser', and generate the markdown
@@ -14,7 +16,7 @@ use
  * @author Evert Pot (http://www.rooftopsolutions.nl/)
  * @license Mit
  */
-class Generator 
+class Generator
 {
 
     /**
@@ -32,32 +34,44 @@ class Generator
     protected $classDefinitions;
 
     /**
+     * Directory containing the twig templates
+     *
+     * @var string
+     */
+    protected $templateDir;
+
+    /**
      * Constructor
      *
      * @param string $structureXmlFile
      * @param string $outputDir
      */
-    public function __construct(array $classDefinitions, $outputDir)
+    public function __construct(array $classDefinitions, $outputDir, $templateDir)
     {
 
         $this->classDefinitions = $classDefinitions;
         $this->outputDir = $outputDir;
+        $this->templateDir = $templateDir;
 
     }
 
     /**
      * Starts the generator
-     * 
+     *
      * @return void
      */
     public function run() {
 
         $loader = new Twig_Loader_String();
         $twig = new Twig_Environment($loader);
+
+        // Sad, sad global
+        $GLOBALS['PHPDocMD_classDefinitions'] = $this->classDefinitions;
+
         $twig->addFilter('classLink', new Twig_Filter_Function('PHPDocMd\\Generator::classLink'));
         foreach($this->classDefinitions as $className=>$data) {
 
-            $output = $twig->render(file_get_contents(__DIR__ . '/../templates/class.twig'),
+            $output = $twig->render(file_get_contents($this->templateDir . '/class.twig'),
                 $data
             );
             file_put_contents($this->outputDir . '/' . $data['fileName'], $output);
@@ -65,9 +79,22 @@ class Generator
         }
 
     }
-    function classLink($className) {
 
-        global $classDefinitions;
+    /**
+     * This is a twig template function.
+     *
+     * This function allows us to easily link classes to their existing
+     * pages.
+     *
+     * Due to the unfortunate way twig works, this must be static, and we must
+     * use a global to achieve our goal.
+     *
+     * @param mixed $className
+     * @return void
+     */
+    static function classLink($className) {
+
+        $classDefinitions = $GLOBALS['PHPDocMD_classDefinitions'];
 
         $returnedClasses = array();
 
