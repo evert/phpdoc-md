@@ -71,12 +71,72 @@ class Generator
         $twig->addFilter('classLink', new Twig_Filter_Function('PHPDocMd\\Generator::classLink'));
         foreach($this->classDefinitions as $className=>$data) {
 
-            $output = $twig->render(file_get_contents($this->templateDir . '/class.twig'),
+            $output = $twig->render(
+                file_get_contents($this->templateDir . '/class.twig'),
                 $data
             );
             file_put_contents($this->outputDir . '/' . $data['fileName'], $output);
 
         }
+
+        $index = $this->createIndex();
+
+        $index = $twig->render(
+            file_get_contents($this->templateDir . '/index.twig'),
+            array(
+                'index' => $index,
+                'classDefinitions' => $this->classDefinitions,
+            )
+        );
+
+        file_put_contents($this->outputDir . '/ApiIndex.md', $index);
+
+    }
+
+    /**
+     * Creates an index of classes and namespaces.
+     *
+     * I'm generating the actual markdown output here, which isn't great.. but
+     * it will have to do. If I don't want to make things too complicated.
+     *
+     * @return array
+     */
+    protected function createIndex() {
+
+        $tree = array();
+
+        foreach($this->classDefinitions as $className=>$classInfo) {
+
+            $current =& $tree;
+
+            foreach(explode('\\', $className) as $part) {
+
+                if (!isset($current[$part])) {
+                    $current[$part] = array();
+                }
+                $current =& $current[$part];
+
+            }
+
+        }
+
+        $treeOutput = '';
+        $treeOutput = function($item, $fullString = '', $depth=0) use (&$treeOutput) {
+
+            $output = '';
+            foreach($item as $name=>$subItems) {
+
+                $fullName = $fullString?$fullString."\\".$name:$name;
+                $output.= str_repeat('  ', $depth) . '* ' . Generator::classLink($fullName, $name) . "\n";
+                $output.= $treeOutput($subItems, $fullName, $depth+1);
+
+            }
+
+            return $output;
+
+        };
+
+        return $treeOutput($tree);
 
     }
 
@@ -92,7 +152,7 @@ class Generator
      * @param mixed $className
      * @return void
      */
-    static function classLink($className) {
+    static function classLink($className, $label = null) {
 
         $classDefinitions = $GLOBALS['PHPDocMD_classDefinitions'];
 
@@ -101,6 +161,8 @@ class Generator
         foreach(explode('|', $className) as $oneClass) {
 
             $oneClass = trim($oneClass,'\\ ');
+
+            $myLabel = $label?:$oneClass;
 
             if (!isset($classDefinitions[$oneClass])) {
 
@@ -114,7 +176,7 @@ class Generator
 
             } else {
 
-                $returnedClasses[] = "[" . $oneClass . "](" . str_replace('\\', '-', $oneClass) . ')';
+                $returnedClasses[] = "[" . $myLabel . "](" . str_replace('\\', '-', $oneClass) . ')';
 
             }
 
