@@ -108,6 +108,7 @@ class Parser
                 'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
                 'methods' => $this->parseMethods($class),
                 'properties' => $this->parseProperties($class),
+                'constants' => $this->parseConstants($class),
             );
 
         }
@@ -180,6 +181,7 @@ class Parser
                 'name' => $methodName,
                 'description' => (string)$method->docblock->description . "\n\n" . (string)$method->docblock->{"long-description"},
                 'visibility' => (string)$method['visibility'],
+                'abstract'   => ((string)$method['abstract'])=="true",
                 'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
                 'signature' => $signature,
                 'arguments' => $arguments
@@ -210,6 +212,8 @@ class Parser
 
             $type = 'mixed';
             $propName = (string)$xProperty->name;
+            $default = (string)$xProperty->default;
+
             $xVar = $xProperty->xpath('docblock/tag[@name="var"]');
             if (count($xVar)) {
                 $type = $xVar[0]->type;
@@ -218,9 +222,12 @@ class Parser
             $visibility = (string)$xProperty['visibility'];
             $signature = $visibility . ' ' . $type . ' ' . $propName;
 
+            if ($default) $signature.=' = ' . $default;
+
             $properties[$propName] = array(
                 'name' => $propName,
                 'type' => $type,
+                'default' => $default,
                 'description' => (string)$xProperty->docblock->description . "\n\n" . (string)$xProperty->docblock->{"long-description"},
                 'visibility' => $visibility,
                 'signature' => $signature,
@@ -229,6 +236,42 @@ class Parser
 
         }
         return $properties;
+
+    }
+
+    /**
+     * Parses all constant information for a single class or interface.
+     *
+     * You must pass an xml element that refers to either the class or
+     * interface element from structure.xml.
+     *
+     * @param SimpleXMLElement $class
+     * @return array
+     */
+    protected function parseConstants(SimpleXMLElement $class) {
+
+        $constants = array();
+
+        $className = (string)$class->full_name;
+        $className = ltrim($className,'\\');
+
+        foreach($class->constant as $xConstant) {
+
+            $name = (string)$xConstant->name;
+            $value = (string)$xConstant->value;
+
+            $signature = 'const ' . $name . ' ' . $value;
+
+            $constants[$name] = array(
+                'name' => $name,
+                'description' => (string)$xConstant->docblock->description . "\n\n" . (string)$xConstant->docblock->{"long-description"},
+                'signature' => $signature,
+                'value' => $value,
+                'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
+            );
+
+        }
+        return $constants;
 
     }
 

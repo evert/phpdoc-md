@@ -31,11 +31,29 @@
 
 {% endif %}
 
+{% if constants %}
+Constants
+----------
+{% endif %}
+
+{% for constant in constants %}
+
+### {{ constant.name }}
+
+```
+{{ constant.signature }}
+```
+
+{{ property.description|raw }}
+
+{% if constant.deprecated %}* **Warning:** this constant is **deprecated**. This means that this constant will likely be removed in a future version.
+{% endif %}
+
+{% endfor %}
+
+{% if properties %}
 Properties
 ----------
-
-{% if not properties %}
-This class defines no properties
 {% endif %}
 
 {% for property in properties %}
@@ -54,11 +72,9 @@ This class defines no properties
 
 {% endfor %}
 
+{% if methods %}
 Methods
 -------
-
-{% if not methods %}
-This class defines no methods
 {% endif %}
 
 {% for method in methods %}
@@ -72,6 +88,8 @@ This class defines no methods
 {{ method.description|raw }}
 
 * Visibility: **{{ method.visibility }}**
+{% if method.abstract %}* This method is **abstract**.
+{% endif %}
 {% if method.deprecated %}* **Warning:** this method is **deprecated**. This means that this method will likely be removed in a future version.
 {% endif %}
 
