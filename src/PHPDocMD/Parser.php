@@ -184,7 +184,8 @@ class Parser
                 'abstract'   => ((string)$method['abstract'])=="true",
                 'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
                 'signature' => $signature,
-                'arguments' => $arguments
+                'arguments' => $arguments,
+                'definedBy' => $className,
             );
 
         }
@@ -232,6 +233,7 @@ class Parser
                 'visibility' => $visibility,
                 'signature' => $signature,
                 'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
+                'definedBy' => $className,
             );
 
         }
@@ -268,6 +270,7 @@ class Parser
                 'signature' => $signature,
                 'value' => $value,
                 'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
+                'definedBy' => $className,
             );
 
         }
