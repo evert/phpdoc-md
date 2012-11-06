@@ -48,6 +48,10 @@ This class defines no properties
 
 {{ property.description|raw }}
 
+* Visibility: **{{ property.visibility }}**
+{% if property.deprecated %}* **Warning:** this property is **deprecated**. This means that this property will likely be removed in a future version.
+{% endif %}
+
 {% endfor %}
 
 Methods
@@ -66,6 +70,10 @@ This class defines no methods
 ```
 
 {{ method.description|raw }}
+
+* Visibility: **{{ method.visibility }}**
+{% if method.deprecated %}* **Warning:** this method is **deprecated**. This means that this method will likely be removed in a future version.
+{% endif %}
 
 {% if method.arguments %}
 #### Arguments

@@ -54,6 +54,7 @@ class Parser
         foreach($this->classDefinitions as $className=>$classInfo) {
 
             $this->expandMethods($className);
+            $this->expandProperties($className);
 
         }
 
@@ -116,13 +117,13 @@ class Parser
     }
 
     /**
-     * Parses all the method information for a single class or interface. 
+     * Parses all the method information for a single class or interface.
      *
      * You must pass an xml element that refers to either the class or
      * interface element from structure.xml.
      *
      * @param SimpleXMLElement $class
-     * @return array 
+     * @return array
      */
     protected function parseMethods(SimpleXMLElement $class) {
 
@@ -178,8 +179,9 @@ class Parser
             $methods[$methodName] = array(
                 'name' => $methodName,
                 'description' => (string)$method->docblock->description . "\n\n" . (string)$method->docblock->{"long-description"},
-                'signature' => $signature,
                 'visibility' => (string)$method['visibility'],
+                'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
+                'signature' => $signature,
                 'arguments' => $arguments
             );
 
@@ -189,13 +191,13 @@ class Parser
     }
 
     /**
-     * Parses all property information for a single class or interface. 
+     * Parses all property information for a single class or interface.
      *
      * You must pass an xml element that refers to either the class or
      * interface element from structure.xml.
      *
      * @param SimpleXMLElement $class
-     * @return array 
+     * @return array
      */
     protected function parseProperties(SimpleXMLElement $class) {
 
@@ -213,8 +215,7 @@ class Parser
                 $type = $xVar[0]->type;
             }
 
-            $visibility = (string)$xProperty['visbility'];
-
+            $visibility = (string)$xProperty['visibility'];
             $signature = $visibility . ' ' . $type . ' ' . $propName;
 
             $properties[$propName] = array(
@@ -223,6 +224,7 @@ class Parser
                 'description' => (string)$xProperty->docblock->description . "\n\n" . (string)$xProperty->docblock->{"long-description"},
                 'visibility' => $visibility,
                 'signature' => $signature,
+                'deprecated' => count($class->xpath('docblock/tag[@name="deprecated"]'))>0,
             );
 
         }
@@ -234,7 +236,7 @@ class Parser
      * This method goes through all the class definitions, and adds
      * non-overriden method information from parent classes.
      *
-     * @return void
+     * @return array
      */
     protected function expandMethods($className)
     {
@@ -242,24 +244,8 @@ class Parser
         $class = $this->classDefinitions[$className];
 
         $newMethods = array();
-        foreach($class['implements'] as $implements) {
 
-            if (!isset($this->classDefinitions[$implements])) {
-                continue;
-            }
-
-            foreach($this->classDefinitions[$implements]['methods'] as $methodName => $methodInfo) {
-
-                if (!isset($class[$methodName])) {
-                    $newMethods[$methodName] = $methodInfo;
-                }
-
-            }
-
-            $newMethods = array_merge($newMethods, $this->expandMethods($implements));
-
-        }
-        foreach($class['extends'] as $extends) {
+        foreach(array_merge($class['extends'], $class['implements']) as $extends) {
 
             if (!isset($this->classDefinitions[$extends])) {
                 continue;
@@ -282,4 +268,41 @@ class Parser
 
     }
 
+    /**
+     * This method goes through all the class definitions, and adds
+     * non-overriden property information from parent classes.
+     *
+     * @return array
+     */
+    protected function expandProperties($className)
+    {
+
+        $class = $this->classDefinitions[$className];
+
+        $newProperties = array();
+        foreach(array_merge($class['implements'], $class['extends']) as $extends) {
+
+            if (!isset($this->classDefinitions[$extends])) {
+                continue;
+            }
+
+            foreach($this->classDefinitions[$extends]['properties'] as $propertyName => $propertyInfo) {
+
+                if ($propertyInfo['visibility']==='private') {
+                    continue;
+                }
+                if (!isset($class[$propertyName])) {
+                    $newProperties[$propertyName] = $propertyInfo;
+                }
+
+            }
+
+            $newProperties = array_merge($newProperties, $this->expandProperties($extends));
+
+        }
+
+        $this->classDefinitions[$className]['properties']+=$newProperties;
+        return $newProperties;
+
+    }
 }
