@@ -104,19 +104,10 @@ Methods
 {% if method.arguments %}
 #### Arguments
 
-<table>
 {% for argument in method.arguments %}
-
-  <tr>
-     <td>{{ argument.name }}</td>
-     <td>{% if argument.type %}{{ argument.type|classLink }}{% else %}mixed{% endif %}</td>
-     {% if argument.description %}<td>{{ argument.description }}</td>{% endif %}
-
-  </tr>
+* {{ argument.name }} **{% if argument.type %}{{ argument.type|classLink }}{% else %}mixed{% endif %}**{% if argument.description %} - {{ argument.description }}{% endif %}
 
 {% endfor %}
-
-</table>
 
 {% endif %}
 
