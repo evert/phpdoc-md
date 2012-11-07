@@ -264,7 +264,7 @@ class Parser
             $name = (string)$xConstant->name;
             $value = (string)$xConstant->value;
 
-            $signature = 'const ' . $name . ' ' . $value;
+            $signature = 'const ' . $name . ' = ' . $value;
 
             $constants[$name] = array(
                 'name' => $name,
