@@ -1,3 +1,6 @@
+0.0.8-alpha (2013-02-11)
+	* Added: --lt option.
+
 0.0.7-alpha (2013-02-11)
 	* Fixed: Relative links in github. Thnx @jelmersnoeck.
 	* Fixed: Lots of bugfixes before this point :)

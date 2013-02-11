@@ -16,7 +16,31 @@ foreach($paths as $path) {
 
 }
 
-if ($argc < 3) {
+// Everts crappy option parser.
+
+$arguments = $argv;
+array_shift($arguments);
+
+// Re-indexing
+$arguments = array_values($arguments);
+
+$positional = array();
+$named = array(
+    'lt' => "%c.md",
+);
+
+for($i=0; $i < count($arguments); $i++) {
+
+    if (substr($arguments[$i],0,2)==='-') {
+        $named[substr($arguments[$i],2)] = $arguments[$i+1];
+        $i++;
+    } else {
+        $positional[] = $arguments[$i];
+    }
+
+}
+
+if (count($positional) < 1) {
     echo <<<HI
 PHPDocumentor Markdown Generator
 
@@ -29,13 +53,20 @@ Usage:
     # Next, run phpdocmd:
     {$argv[0]} structure.xml [outputdir]
 
+Options:
+
+    --lt [template]
+        This specifies the 'template' for links we're generating. By default
+        this is "%c.md".
+
+
 HI;
     die();
+
 }
 
-$input = $argv[1];
-$outputDir = $argv[2];
-
+$input = $positional[0];
+$outputDir = isset($positional[1])?$positional[1]:'.';
 
 $parser = new PHPDocMD\Parser(
     $input
@@ -50,7 +81,8 @@ $templateDir = __DIR__ . '/../templates/';
 $generator = new PHPDocMD\Generator(
     $classDefinitions,
     $outputDir,
-    $templateDir
+    $templateDir,
+    $named['lt']
 );
 
 echo "Opening knapsack combusters\n";

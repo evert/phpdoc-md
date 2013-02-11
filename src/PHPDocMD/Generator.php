@@ -41,17 +41,27 @@ class Generator
     protected $templateDir;
 
     /**
+     * A simple template for generating links.
+     *
+     * @var string
+     */
+    protected $linkTemplate;
+
+    /**
      * Constructor
      *
      * @param string $structureXmlFile
      * @param string $outputDir
+     * @param string $templateDir
+     * @param string $linkTemplate
      */
-    public function __construct(array $classDefinitions, $outputDir, $templateDir)
+    public function __construct(array $classDefinitions, $outputDir, $templateDir, $linkTemplate = '%c.md')
     {
 
         $this->classDefinitions = $classDefinitions;
         $this->outputDir = $outputDir;
         $this->templateDir = $templateDir;
+        $this->linkTemplate = $linkTemplate;
 
     }
 
@@ -65,8 +75,9 @@ class Generator
         $loader = new Twig_Loader_String();
         $twig = new Twig_Environment($loader);
 
-        // Sad, sad global
+        // Sad, sad globals
         $GLOBALS['PHPDocMD_classDefinitions'] = $this->classDefinitions;
+        $GLOBALS['PHPDocMD_linkTemplate'] = $this->linkTemplate;
 
         $twig->addFilter('classLink', new Twig_Filter_Function('PHPDocMd\\Generator::classLink'));
         foreach($this->classDefinitions as $className=>$data) {
@@ -155,6 +166,7 @@ class Generator
     static function classLink($className, $label = null) {
 
         $classDefinitions = $GLOBALS['PHPDocMD_classDefinitions'];
+        $linkTemplate = $GLOBALS['PHPDocMD_linkTemplate'];
 
         $returnedClasses = array();
 
@@ -176,7 +188,10 @@ class Generator
 
             } else {
 
-                $returnedClasses[] = "[" . $myLabel . "](" . str_replace('\\', '-', $oneClass) . '.md)';
+                $link = str_replace('\\', '-', $oneClass);
+                $link = strtr($linkTemplate, array('%c' => $link));
+
+                $returnedClasses[] = "[" . $myLabel . "](" . $link . ')';
 
             }
 
