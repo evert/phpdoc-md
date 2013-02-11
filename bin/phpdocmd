@@ -31,7 +31,7 @@ $named = array(
 
 for($i=0; $i < count($arguments); $i++) {
 
-    if (substr($arguments[$i],0,2)==='-') {
+    if (substr($arguments[$i],0,2)==='--') {
         $named[substr($arguments[$i],2)] = $arguments[$i+1];
         $i++;
     } else {
