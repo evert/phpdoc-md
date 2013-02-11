@@ -176,7 +176,7 @@ class Generator
 
             } else {
 
-                $returnedClasses[] = "[" . $myLabel . "](" . str_replace('\\', '-', $oneClass) . ')';
+                $returnedClasses[] = "[" . $myLabel . "](" . str_replace('\\', '-', $oneClass) . '.md)';
 
             }
 
