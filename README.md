@@ -13,22 +13,23 @@ It only documents classes and interfaces.
 The code is ugly, it was intended as a one-off, and I was in a hurry.. so the
 codebase may not be up to your standards. (it certainly isn't up to mine).
 
-**Usage:**
+Usage
+-----
 
-You must have phpdocumentor2 installed.
+    # You must have phpdocumentor2 installed.
+    # First generate a structure.xml file with phpdocumentor.
+    # This command will generate structure.xml in the current directory.
+    phpdoc parse -t . -d [project path]
 
-First generate a `structure.xml` file as such:
+    # Next, run phpdocmd:
+    {$argv[0]} structure.xml [outputdir]
 
-```
-phpdoc parse -t . -d [project path]
-```
+Options
+-------
 
-This will create the xml file in the current directory.
-Next, call the phpdocmd script: 
-
-```
-phpdocmd structure.xml [outputdir]
-```
+    --lt [template]
+        This specifies the 'template' for links we're generating. By default
+        this is "%c.md".
 
 This should generate all the .md files. I'm excited to hear your feedback.
 
