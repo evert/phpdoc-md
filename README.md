@@ -13,6 +13,23 @@ It only documents classes and interfaces.
 The code is ugly, it was intended as a one-off, and I was in a hurry.. so the
 codebase may not be up to your standards. (it certainly isn't up to mine).
 
+Installation
+------------
+
+This project assumes you have composer installed.
+Simply add:
+
+    "require-dev" : {
+    
+        "evert/phpdoc-md" : "0.0.*"
+    
+    }
+
+To your composer.json, and then you can simply install with:
+
+    composer install --dev
+
+
 Usage
 -----
 
