@@ -105,7 +105,7 @@ Methods
 #### Arguments
 
 {% for argument in method.arguments %}
-* {{ argument.name }} **{% if argument.type %}{{ argument.type|classLink }}{% else %}mixed{% endif %}**{% if argument.description %} - {{ argument.description|stripOuterPTags|raw }}{% endif %}
+* {{ argument.name }} **{% if argument.type %}{{ argument.type|classLink }}{% else %}mixed{% endif %}**{% if argument.description %} - {{ argument.description|stripPTags|raw }}{% endif %}
 
 {% endfor %}
 
