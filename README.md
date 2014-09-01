@@ -20,14 +20,14 @@ This project assumes you have composer installed.
 Simply add:
 
     "require-dev" : {
-    
-        "evert/phpdoc-md" : "0.0.*"
-    
+
+        "evert/phpdoc-md" : "~0.0.7"
+
     }
 
 To your composer.json, and then you can simply install with:
 
-    composer install --dev
+    composer install
 
 
 Usage
