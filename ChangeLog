@@ -1,5 +1,7 @@
 0.0.8-alpha (2014-09-01)
 	* Added: phpdocumentor is now a dev-dependency.
+	* Fixed: Updated documentation so it's correct again for the latest
+	  phpdocumentor.
 
 0.0.7-alpha (2013-02-11)
 	* Added: --lt option.

@@ -33,13 +33,20 @@ To your composer.json, and then you can simply install with:
 Usage
 -----
 
-    # You must have phpdocumentor2 installed.
-    # First generate a structure.xml file with phpdocumentor.
-    # This command will generate structure.xml in the current directory.
-    phpdoc parse -t . -d [project path]
+First ensure that phpdocumentor 2 is installed somewhere, after, you must
+generate a file called `structure.xml`.
+
+The easiest is to create a temporary directory, for example named `docs/` as
+phpDocumentor2 creates a lot of 'cache' directories.
+
+    # phpdoc command
+    mkdir docs
+    cd docs
+    phpdoc  -d [project path] -t . --template="xml"
+    rm -r phpdoc-cache-*
 
     # Next, run phpdocmd:
-    {$argv[0]} structure.xml [outputdir]
+    phpdocmd structure.xml [outputdir]
 
 Options
 -------
