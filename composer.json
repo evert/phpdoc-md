@@ -8,6 +8,9 @@
         "php" : ">=5.3.1",
         "twig/twig" : "~1.16.0"
     },
+    "require-dev" : {
+        "phpdocumentor/phpdocumentor" : "~2.7.0"
+    },
     "authors" : [
         {
             "name" : "Evert Pot",
@@ -23,5 +26,8 @@
     },
     "bin" : [
         "bin/phpdocmd"
-    ]
+    ],
+    "config" : {
+        "bin-dir" : "bin"
+    }
 }
