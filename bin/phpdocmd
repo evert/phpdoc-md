@@ -72,7 +72,7 @@ $parser = new PHPDocMD\Parser(
     $input
 );
 
-echo "Re-aligning ice-tea flasks\n";
+echo "Parsing structure.xml\n";
 
 $classDefinitions = $parser->run();
 
@@ -85,7 +85,7 @@ $generator = new PHPDocMD\Generator(
     $named['lt']
 );
 
-echo "Opening knapsack combusters\n";
+echo "Generating pages\n";
 $generator->run();
 
 echo "Complete\n";

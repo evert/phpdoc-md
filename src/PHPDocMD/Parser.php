@@ -135,7 +135,7 @@ class Parser
 
         foreach($class->method as $method) {
 
-            $methodName = (string)$method->full_name;
+            $methodName = (string)$method->name;
 
             $return = $method->xpath('docblock/tag[@name="return"]');
             if (count($return)) {
@@ -311,7 +311,10 @@ class Parser
 
         }
 
-        $this->classDefinitions[$className]['methods']+=$newMethods;
+        $this->classDefinitions[$className]['methods'] = array_merge(
+            $this->classDefinitions[$className]['methods'],
+            $newMethods
+        );
         return $newMethods;
 
     }

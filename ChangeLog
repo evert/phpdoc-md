@@ -1,9 +1,11 @@
-0.0.8-alpha (2014-09-01)
+0.1.0-alpha (2014-09-01)
 	* Added: phpdocumentor is now a dev-dependency.
 	* Fixed: Updated documentation so it's correct again for the latest
 	  phpdocumentor.
 	* Changed: Using the more universal "4 space" indentation syntax for code,
 	  instead of github's triple-backtick syntax.
+	* Fixed: Template variables about which class defined a property or
+	  method, is correct again.
 
 0.0.7-alpha (2013-02-11)
 	* Added: --lt option.
