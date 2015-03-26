@@ -6,10 +6,10 @@
     "license" : "MIT",
     "require" : {
         "php" : ">=5.3.1",
-        "twig/twig" : "~1.16.0"
+        "twig/twig" : "~1.18.0"
     },
     "require-dev" : {
-        "phpdocumentor/phpdocumentor" : "~2.7.0"
+        "phpdocumentor/phpdocumentor" : "~2.8.0"
     },
     "authors" : [
         {
