@@ -1,5 +1,6 @@
 0.1.1-alpha (2015-03-26)
-	* Updated to the latest dependencies.
+	* Updated: Updated to the latest dependencies.
+	* Changed: Switched to PSR-4
 
 0.1.0-alpha (2014-09-01)
 	* Added: phpdocumentor is now a dev-dependency.
