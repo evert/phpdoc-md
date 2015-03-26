@@ -4,8 +4,8 @@ PHPDocumentor MarkDown export
 This is a script that can generate markdown (.md) files for your API
 documentation.
 
-It is tailored for projects using PSR-0, PSR-1, PSR-2 and PHP 5.3 namespaces.
-The project was primarily developed for [SabreDAV](https://github.com/evert/sabreDAV),
+It is tailored for projects using PSR-0, PSR-1, PSR-2, PSR-4 and namespaces.
+The project was primarily developed for [sabre/dav](https://sabre.io/),
 but it should work for other codebases as well.
 
 It only documents classes and interfaces.
@@ -21,7 +21,7 @@ Simply add:
 
     "require-dev" : {
 
-        "evert/phpdoc-md" : "~0.0.7"
+        "evert/phpdoc-md" : "~0.1.1"
 
     }
 
@@ -36,17 +36,13 @@ Usage
 First ensure that phpdocumentor 2 is installed somewhere, after, you must
 generate a file called `structure.xml`.
 
-The easiest is to create a temporary directory, for example named `docs/` as
-phpDocumentor2 creates a lot of 'cache' directories.
+The easiest is to create a temporary directory, for example named `docs/`.
 
     # phpdoc command
-    mkdir docs
-    cd docs
-    phpdoc  -d [project path] -t . --template="xml"
-    rm -r phpdoc-cache-*
+    phpdoc  -d [project path] -t docs/ --template="xml"
 
     # Next, run phpdocmd:
-    phpdocmd structure.xml [outputdir]
+    phpdocmd docs/structure.xml [outputdir]
 
 Options
 -------
