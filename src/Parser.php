@@ -71,6 +71,7 @@ class Parser
      */
     protected function getClassDefinitions(SimpleXmlElement $xml) {
 
+        $classNames = array();
         foreach($xml->xpath('file/class|file/interface') as $class) {
 
             $className = (string)$class->full_name;
