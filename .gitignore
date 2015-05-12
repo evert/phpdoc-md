@@ -5,3 +5,5 @@ composer.lock
 # Binaries
 /bin/phpdoc
 /bin/phpdoc.php
+/bin/jsonlint
+/bin/validate-json

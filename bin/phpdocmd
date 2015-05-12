@@ -1,76 +1,63 @@
 #!/usr/bin/env php
 <?php
 
-// Potential composer autoloader paths
+/**
+ * Possible Composer autoload paths.
+ */
 $paths = array(
     __DIR__ . '/../vendor/autoload.php',
     __DIR__ . '/../../../autoload.php',
 );
 
-foreach($paths as $path) {
-
+foreach ($paths as $path) {
     if (file_exists($path)) {
         include $path;
         break;
     }
-
 }
 
-// Everts crappy option parser.
+/**
+ * Time to parse arguments...
+ */
 
 $arguments = $argv;
 array_shift($arguments);
 
-// Re-indexing
+/**
+ * Let's re-index the arguments array.
+ */
 $arguments = array_values($arguments);
 
 $positional = array();
+
 $named = array(
-    'lt' => "%c.md",
+    'lt' => '%c.md',
 );
 
-for($i=0; $i < count($arguments); $i++) {
-
-    if (substr($arguments[$i],0,2)==='--') {
-        $named[substr($arguments[$i],2)] = $arguments[$i+1];
+for ($i = 0; $i < count($arguments); $i++) {
+    if (substr($arguments[$i], 0, 2) === '--') {
+        $named[substr($arguments[$i], 2)] = $arguments[$i + 1];
         $i++;
     } else {
         $positional[] = $arguments[$i];
     }
-
 }
 
 if (count($positional) < 1) {
-    echo <<<HI
-PHPDocumentor Markdown Generator
-
-Usage:
-
-    # First generate a structure.xml file with phpdocumentor.
-    # This command will generate structure.xml in the docs directry
-    phpdoc -d [project path] -t docs/ --template="xml"
-
-    # Next, run phpdocmd:
-    {$argv[0]} docs/structure.xml [outputdir]
-
-Options:
-
-    --lt [template]
-        This specifies the 'template' for links we're generating. By default
-        this is "%c.md".
-
-
-HI;
+    include(__DIR__ . '/../src/usage.inc.php');
     die();
 
 }
 
 $input = $positional[0];
-$outputDir = isset($positional[1])?$positional[1]:'.';
 
-$parser = new PHPDocMD\Parser(
-    $input
-);
+$outputDir = '.';
+
+if (isset($positional[1])) {
+    $outputDir = $positional[1];
+}
+
+$parser = new PHPDocMD\Parser($input);
 
 echo "Parsing structure.xml\n";
 
@@ -86,6 +73,7 @@ $generator = new PHPDocMD\Generator(
 );
 
 echo "Generating pages\n";
+
 $generator->run();
 
 echo "Complete\n";
