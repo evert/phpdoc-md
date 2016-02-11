@@ -3,8 +3,8 @@
 namespace PHPDocMD;
 
 use Twig_Environment;
-use Twig_Filter_Function;
-use Twig_Loader_String;
+use Twig_Loader_Filesystem;
+use Twig_SimpleFilter;
 
 /**
  * This class takes the output from 'parser', and generate the markdown
@@ -63,13 +63,18 @@ class Generator
      */
     public function run()
     {
-        $loader = new Twig_Loader_String();
+        $loader = new Twig_Loader_Filesystem($this->templateDir, array(
+            'cache' => false,
+            'debug' => true,
+        ));
+
         $twig = new Twig_Environment($loader);
 
         $GLOBALS['PHPDocMD_classDefinitions'] = $this->classDefinitions;
         $GLOBALS['PHPDocMD_linkTemplate'] = $this->linkTemplate;
 
-        $twig->addFilter('classLink', new Twig_Filter_Function('PHPDocMd\Generator::classLink'));
+        $filter = new Twig_SimpleFilter('classLink', array('PHPDocMd\\Generator', 'classLink'));
+        $twig->addFilter($filter);
 
         foreach ($this->classDefinitions as $className => $data) {
             $output = $twig->render(
