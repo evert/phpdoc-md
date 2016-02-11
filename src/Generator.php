@@ -3,8 +3,8 @@
 namespace PHPDocMD;
 
 use Twig_Environment;
-use Twig_Filter_Function;
-use Twig_Loader_String;
+use Twig_Loader_Filesystem;
+use Twig_SimpleFilter;
 
 /**
  * This class takes the output from 'parser', and generate the markdown
@@ -45,17 +45,26 @@ class Generator
     protected $linkTemplate;
 
     /**
+     * Filename for API Index.
+     *
+     * @var string
+     */
+    protected $apiIndexFile;
+
+    /**
      * @param array  $classDefinitions
      * @param string $outputDir
      * @param string $templateDir
      * @param string $linkTemplate
+     * @param string $apiIndexFile
      */
-    public function __construct(array $classDefinitions, $outputDir, $templateDir, $linkTemplate = '%c.md')
+    public function __construct(array $classDefinitions, $outputDir, $templateDir, $linkTemplate = '%c.md', $apiIndexFile = 'ApiIndex.md')
     {
         $this->classDefinitions = $classDefinitions;
         $this->outputDir = $outputDir;
         $this->templateDir = $templateDir;
         $this->linkTemplate = $linkTemplate;
+        $this->apiIndexFile = $apiIndexFile;
     }
 
     /**
@@ -63,34 +72,35 @@ class Generator
      */
     public function run()
     {
-        $loader = new Twig_Loader_String();
+        $loader = new Twig_Loader_Filesystem($this->templateDir, array(
+            'cache' => false,
+            'debug' => true,
+        ));
+
         $twig = new Twig_Environment($loader);
 
         $GLOBALS['PHPDocMD_classDefinitions'] = $this->classDefinitions;
         $GLOBALS['PHPDocMD_linkTemplate'] = $this->linkTemplate;
 
-        $twig->addFilter('classLink', new Twig_Filter_Function('PHPDocMd\Generator::classLink'));
+        $filter = new Twig_SimpleFilter('classLink', array('PHPDocMd\\Generator', 'classLink'));
+        $twig->addFilter($filter);
 
         foreach ($this->classDefinitions as $className => $data) {
-            $output = $twig->render(
-                file_get_contents($this->templateDir . '/class.twig'),
-                $data
-            );
+            $output = $twig->render('class.twig', $data);
 
             file_put_contents($this->outputDir . '/' . $data['fileName'], $output);
         }
 
         $index = $this->createIndex();
 
-        $index = $twig->render(
-            file_get_contents($this->templateDir . '/index.twig'),
+        $index = $twig->render('index.twig',
             array(
                 'index'            => $index,
                 'classDefinitions' => $this->classDefinitions,
             )
         );
 
-        file_put_contents($this->outputDir . '/ApiIndex.md', $index);
+        file_put_contents($this->outputDir . '/' . $this->apiIndexFile, $index);
     }
 
     /**
