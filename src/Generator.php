@@ -45,17 +45,26 @@ class Generator
     protected $linkTemplate;
 
     /**
+     * Filename for API Index.
+     *
+     * @var string
+     */
+    protected $apiIndexFile;
+
+    /**
      * @param array  $classDefinitions
      * @param string $outputDir
      * @param string $templateDir
      * @param string $linkTemplate
+     * @param string $apiIndexFile
      */
-    public function __construct(array $classDefinitions, $outputDir, $templateDir, $linkTemplate = '%c.md')
+    public function __construct(array $classDefinitions, $outputDir, $templateDir, $linkTemplate = '%c.md', $apiIndexFile = 'ApiIndex.md')
     {
         $this->classDefinitions = $classDefinitions;
         $this->outputDir = $outputDir;
         $this->templateDir = $templateDir;
         $this->linkTemplate = $linkTemplate;
+        $this->apiIndexFile = $apiIndexFile;
     }
 
     /**
@@ -91,7 +100,7 @@ class Generator
             )
         );
 
-        file_put_contents($this->outputDir . '/ApiIndex.md', $index);
+        file_put_contents($this->outputDir . '/' . $this->apiIndexFile, $index);
     }
 
     /**
