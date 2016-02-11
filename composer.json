@@ -5,7 +5,7 @@
     "homepage" : "https://github.com/evert/phpdoc-md",
     "license" : "MIT",
     "require" : {
-        "php" : ">=5.3.1",
+        "php" : ">=5.5.9",
         "twig/twig" : "~1.2|2.0"
     },
     "require-dev" : {
