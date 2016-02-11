@@ -77,18 +77,14 @@ class Generator
         $twig->addFilter($filter);
 
         foreach ($this->classDefinitions as $className => $data) {
-            $output = $twig->render(
-                file_get_contents($this->templateDir . '/class.twig'),
-                $data
-            );
+            $output = $twig->render('class.twig', $data);
 
             file_put_contents($this->outputDir . '/' . $data['fileName'], $output);
         }
 
         $index = $this->createIndex();
 
-        $index = $twig->render(
-            file_get_contents($this->templateDir . '/index.twig'),
+        $index = $twig->render('index.twig',
             array(
                 'index'            => $index,
                 'classDefinitions' => $this->classDefinitions,
