@@ -1,6 +1,10 @@
 PHPDocumentor MarkDown export
 =============================
 [![Build Status](https://travis-ci.org/evert/phpdoc-md.svg)](https://travis-ci.org/evert/phpdoc-md)
+[![Total Downloads](https://poser.pugx.org/evert/phpdoc-md/d/total.svg)](https://packagist.org/packages/evert/phpdoc-md)
+[![Latest Stable Version](https://poser.pugx.org/evert/phpdoc-md/v/stable.svg)](https://packagist.org/packages/evert/phpdoc-md)
+[![Latest Unstable Version](https://poser.pugx.org/evert/phpdoc-md/v/unstable.svg)](https://packagist.org/packages/evert/phpdoc-md)
+[![License](https://poser.pugx.org/evert/phpdoc-md/license.svg)](https://packagist.org/packages/evert/phpdoc-md)
 
 This is a script that can generate markdown (.md) files for your API
 documentation.
