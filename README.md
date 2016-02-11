@@ -1,5 +1,6 @@
 PHPDocumentor MarkDown export
 =============================
+[![Build Status](https://travis-ci.org/evert/phpdoc-md.svg)](https://travis-ci.org/evert/phpdoc-md)
 
 This is a script that can generate markdown (.md) files for your API
 documentation.
