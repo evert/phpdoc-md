@@ -30,7 +30,7 @@ class Parser
     /**
      * @param string $structureXmlFile
      */
-    public function __construct($structureXmlFile)
+    function __construct($structureXmlFile)
     {
         $this->structureXmlFile = $structureXmlFile;
     }
@@ -38,7 +38,7 @@ class Parser
     /**
      * Starts the process.
      */
-    public function run()
+    function run()
     {
         $xml = simplexml_load_file($this->structureXmlFile);
 
@@ -59,47 +59,47 @@ class Parser
      */
     protected function getClassDefinitions(SimpleXmlElement $xml)
     {
-        $classNames = array();
+        $classNames = [];
 
         foreach ($xml->xpath('file/class|file/interface') as $class) {
-            $className = (string) $class->full_name;
+            $className = (string)$class->full_name;
             $className = ltrim($className, '\\');
 
             $fileName = str_replace('\\', '-', $className) . '.md';
 
-            $implements = array();
+            $implements = [];
 
             if (isset($class->implements)) {
                 foreach ($class->implements as $interface) {
-                    $implements[] = ltrim((string) $interface, '\\');
+                    $implements[] = ltrim((string)$interface, '\\');
                 }
             }
 
-            $extends = array();
+            $extends = [];
 
             if (isset($class->extends)) {
                 foreach ($class->extends as $parent) {
-                    $extends[] = ltrim((string) $parent, '\\');
+                    $extends[] = ltrim((string)$parent, '\\');
                 }
             }
 
-            $classNames[$className] = array(
+            $classNames[$className] = [
                 'fileName'        => $fileName,
                 'className'       => $className,
-                'shortClass'      => (string) $class->name,
-                'namespace'       => (string) $class['namespace'],
-                'description'     => (string) $class->docblock->description,
-                'longDescription' => (string) $class->docblock->{'long-description'},
+                'shortClass'      => (string)$class->name,
+                'namespace'       => (string)$class['namespace'],
+                'description'     => (string)$class->docblock->description,
+                'longDescription' => (string)$class->docblock->{'long-description'},
                 'implements'      => $implements,
                 'extends'         => $extends,
                 'isClass'         => $class->getName() === 'class',
                 'isInterface'     => $class->getName() === 'interface',
-                'abstract'        => (string) $class['abstract'] == 'true',
+                'abstract'        => (string)$class['abstract'] == 'true',
                 'deprecated'      => count($class->xpath('docblock/tag[@name="deprecated"]')) > 0,
                 'methods'         => $this->parseMethods($class),
                 'properties'      => $this->parseProperties($class),
                 'constants'       => $this->parseConstants($class),
-            );
+            ];
         }
 
         $this->classDefinitions = $classNames;
@@ -117,29 +117,29 @@ class Parser
      */
     protected function parseMethods(SimpleXMLElement $class)
     {
-        $methods = array();
+        $methods = [];
 
-        $className = (string) $class->full_name;
+        $className = (string)$class->full_name;
         $className = ltrim($className, '\\');
 
         foreach ($class->method as $method) {
-            $methodName = (string) $method->name;
+            $methodName = (string)$method->name;
 
             $return = $method->xpath('docblock/tag[@name="return"]');
 
             if (count($return)) {
-                $return = (string) $return[0]['type'];
+                $return = (string)$return[0]['type'];
             } else {
                 $return = 'mixed';
             }
 
-            $arguments = array();
+            $arguments = [];
 
             foreach ($method->argument as $argument) {
-                $nArgument = array(
-                    'type' => (string) $argument->type,
-                    'name' => (string) $argument->name
-                );
+                $nArgument = [
+                    'type' => (string)$argument->type,
+                    'name' => (string)$argument->name
+                ];
 
                 $tags = $method->xpath(
                     sprintf('docblock/tag[@name="param" and @variable="%s"]', $nArgument['name'])
@@ -148,23 +148,23 @@ class Parser
                 if (count($tags)) {
                     $tag = $tags[0];
 
-                    if ((string) $tag['type']) {
-                        $nArgument['type'] = (string) $tag['type'];
+                    if ((string)$tag['type']) {
+                        $nArgument['type'] = (string)$tag['type'];
                     }
 
-                    if ((string) $tag['description']) {
-                        $nArgument['description'] = (string) $tag['description'];
+                    if ((string)$tag['description']) {
+                        $nArgument['description'] = (string)$tag['description'];
                     }
 
-                    if ((string) $tag['variable']) {
-                        $nArgument['name'] = (string) $tag['variable'];
+                    if ((string)$tag['variable']) {
+                        $nArgument['name'] = (string)$tag['variable'];
                     }
                 }
 
                 $arguments[] = $nArgument;
             }
 
-            $argumentStr = implode(', ', array_map(function ($argument) {
+            $argumentStr = implode(', ', array_map(function($argument) {
                 $return = $argument['name'];
 
                 if ($argument['type']) {
@@ -176,17 +176,17 @@ class Parser
 
             $signature = sprintf('%s %s::%s(%s)', $return, $className, $methodName, $argumentStr);
 
-            $methods[$methodName] = array(
+            $methods[$methodName] = [
                 'name'        => $methodName,
-                'description' => (string) $method->docblock->description . "\n\n" . (string) $method->docblock->{'long-description'},
-                'visibility'  => (string) $method['visibility'],
-                'abstract'    => ((string) $method['abstract']) == "true",
-                'static'      => ((string) $method['static']) == "true",
+                'description' => (string)$method->docblock->description . "\n\n" . (string)$method->docblock->{'long-description'},
+                'visibility'  => (string)$method['visibility'],
+                'abstract'    => ((string)$method['abstract']) == "true",
+                'static'      => ((string)$method['static']) == "true",
                 'deprecated'  => count($class->xpath('docblock/tag[@name="deprecated"]')) > 0,
                 'signature'   => $signature,
                 'arguments'   => $arguments,
                 'definedBy'   => $className,
-            );
+            ];
         }
 
         return $methods;
@@ -204,15 +204,15 @@ class Parser
      */
     protected function parseProperties(SimpleXMLElement $class)
     {
-        $properties = array();
+        $properties = [];
 
-        $className = (string) $class->full_name;
+        $className = (string)$class->full_name;
         $className = ltrim($className, '\\');
 
         foreach ($class->property as $xProperty) {
             $type = 'mixed';
-            $propName = (string) $xProperty->name;
-            $default = (string) $xProperty->default;
+            $propName = (string)$xProperty->name;
+            $default = (string)$xProperty->default;
 
             $xVar = $xProperty->xpath('docblock/tag[@name="var"]');
 
@@ -220,24 +220,24 @@ class Parser
                 $type = $xVar[0]->type;
             }
 
-            $visibility = (string) $xProperty['visibility'];
+            $visibility = (string)$xProperty['visibility'];
             $signature = sprintf('%s %s %s', $visibility, $type, $propName);
 
             if ($default) {
                 $signature .= ' = ' . $default;
             }
 
-            $properties[$propName] = array(
+            $properties[$propName] = [
                 'name'        => $propName,
                 'type'        => $type,
                 'default'     => $default,
-                'description' => (string) $xProperty->docblock->description . "\n\n" . (string) $xProperty->docblock->{'long-description'},
+                'description' => (string)$xProperty->docblock->description . "\n\n" . (string)$xProperty->docblock->{'long-description'},
                 'visibility'  => $visibility,
-                'static'      => ((string) $xProperty['static']) == 'true',
+                'static'      => ((string)$xProperty['static']) == 'true',
                 'signature'   => $signature,
                 'deprecated'  => count($class->xpath('docblock/tag[@name="deprecated"]')) > 0,
                 'definedBy'   => $className,
-            );
+            ];
         }
 
         return $properties;
@@ -255,25 +255,25 @@ class Parser
      */
     protected function parseConstants(SimpleXMLElement $class)
     {
-        $constants = array();
+        $constants = [];
 
-        $className = (string) $class->full_name;
+        $className = (string)$class->full_name;
         $className = ltrim($className, '\\');
 
         foreach ($class->constant as $xConstant) {
-            $name = (string) $xConstant->name;
-            $value = (string) $xConstant->value;
+            $name = (string)$xConstant->name;
+            $value = (string)$xConstant->value;
 
             $signature = sprintf('const %s = %s', $name, $value);
 
-            $constants[$name] = array(
+            $constants[$name] = [
                 'name'        => $name,
-                'description' => (string) $xConstant->docblock->description . "\n\n" . (string) $xConstant->docblock->{'long-description'},
+                'description' => (string)$xConstant->docblock->description . "\n\n" . (string)$xConstant->docblock->{'long-description'},
                 'signature'   => $signature,
                 'value'       => $value,
                 'deprecated'  => count($class->xpath('docblock/tag[@name="deprecated"]')) > 0,
                 'definedBy'   => $className,
-            );
+            ];
         }
 
         return $constants;
@@ -291,7 +291,7 @@ class Parser
     {
         $class = $this->classDefinitions[$className];
 
-        $newMethods = array();
+        $newMethods = [];
 
         foreach (array_merge($class['extends'], $class['implements']) as $extends) {
             if (!isset($this->classDefinitions[$extends])) {
@@ -327,7 +327,7 @@ class Parser
     {
         $class = $this->classDefinitions[$className];
 
-        $newProperties = array();
+        $newProperties = [];
 
         foreach (array_merge($class['implements'], $class['extends']) as $extends) {
             if (!isset($this->classDefinitions[$extends])) {
