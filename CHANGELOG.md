@@ -8,6 +8,7 @@ ChangeLog
 * #87: Now supports Twig 2.0. (@ericdowell)
 * #87: Added ability to override the 'ApiIndex.md' filename via the
   `--index` command line option. (@ericdowell)
+* Using php-cs-fixer and travis.
 
 
 0.1.1 (2015-03-26)
