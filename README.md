@@ -21,7 +21,7 @@ Simply add:
 
     "require-dev" : {
 
-        "evert/phpdoc-md" : "~0.1.1"
+        "evert/phpdoc-md" : "~0.2.0"
 
     }
 

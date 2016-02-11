@@ -7,9 +7,9 @@ use SimpleXMLElement;
 /**
  * This class parses structure.xml and generates the api documentation.
  *
- * @copyright Copyright (C) 2007-2012 Rooftop Solutions. All rights reserved.
- * @author    Evert Pot (http://www.rooftopsolutions.nl/)
- * @license   Mit
+ * @copyright Copyright (C) Evert Pot. All rights reserved.
+ * @author    Evert Pot (https://evertpot.coom/)
+ * @license   MIT
  */
 class Parser
 {
