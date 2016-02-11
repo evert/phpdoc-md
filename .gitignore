@@ -7,3 +7,5 @@ composer.lock
 /bin/phpdoc.php
 /bin/jsonlint
 /bin/validate-json
+/bin/sabre-cs-fixer
+/bin/php-cs-fixer
