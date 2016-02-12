@@ -14,3 +14,7 @@ Options:
     --lt [template]
         This specifies the 'template' for links we're generating. By default
         this is "%c.md".
+
+    --index [filename]
+        This specifies the 'filename' for API Index markdown file we're generating.
+        By default this is "ApiIndex.md".

@@ -22,7 +22,12 @@ Installation
 ------------
 
 This project assumes you have composer installed.
-Simply add:
+
+Run composer command:
+
+    composer install evert/phpdoc-md ~0.2.0 --dev
+
+Or simply add:
 
     "require-dev" : {
 
