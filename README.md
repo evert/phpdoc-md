@@ -25,7 +25,7 @@ This project assumes you have composer installed.
 
 Run composer command:
 
-    composer install evert/phpdoc-md ~0.2.0 --dev
+    composer require evert/phpdoc-md ~0.2.0 --dev
 
 Or simply add:
 
