@@ -11,8 +11,11 @@
     "require-dev" : {
         "phpdocumentor/phpdocumentor" : "~2.8.5",
         "phpdocumentor/reflection-docblock" : "~2.0.4",
-        "symfony/translation" : "~3.0.0",
+        "symfony/translation" : "~2.8.0",
         "nikic/php-parser" : "~0.9.5",
+        "symfony/validator" : "~2.8.0",
+        "monolog/monolog" : "~1.17.2",
+        "symfony/config" : "~2.8.0",
         "sabre/cs" : "~0.0.5"
     },
     "authors" : [
