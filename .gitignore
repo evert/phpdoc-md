@@ -4,7 +4,9 @@ composer.lock
 .*.swp
 
 # Binaries
+/bin/php-cs-fixer
 /bin/phpdoc
 /bin/phpdoc.php
 /bin/jsonlint
+/bin/sabre-cs-fixer
 /bin/validate-json
