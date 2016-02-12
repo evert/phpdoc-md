@@ -15,11 +15,11 @@ use PHPDocMD\Definitions\AbstractDefinition;
  */
 class Parser
 {
-    const ABSTRACT_DEFINITION = '\PHPDocMD\Definitions\AbstractDefinition';
+    const ABSTRACT_DEFINITION = 'PHPDocMD\Definitions\AbstractDefinition';
 
-    const CLASS_DEFINITION = '\PHPDocMD\Definitions\ClassDefinition';
+    const CLASS_DEFINITION = 'PHPDocMD\Definitions\ClassDefinition';
 
-    const FUNCTION_DEFINITION = '\PHPDocMD\Definitions\FunctionDefinition';
+    const FUNCTION_DEFINITION = 'PHPDocMD\Definitions\FunctionDefinition';
 
     /**
      * Path to the structure.xml file.

@@ -74,6 +74,14 @@ class ClassDefinition extends AbstractDefinition
     }
 
     /**
+     * @return string
+     */
+    function getTemplate()
+    {
+        return 'class.twig';
+    }
+
+    /**
      * @return $this
      */
     function parse()
@@ -119,14 +127,14 @@ class ClassDefinition extends AbstractDefinition
     }
 
     /**
-     * @param array $classDefinitions
+     * @param array $definitions
      *
      * @return $this
      */
-    function expand(array $classDefinitions)
+    function expand(array $definitions)
     {
-        $this->expandMethods($classDefinitions, $this->getName());
-        $this->expandProperties($classDefinitions, $this->getName());
+        $this->expandMethods($definitions, $this->getName());
+        $this->expandProperties($definitions, $this->getName());
 
         return $this;
     }

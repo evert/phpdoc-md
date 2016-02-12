@@ -25,16 +25,21 @@ abstract class AbstractDefinition
     abstract function parse();
 
     /**
-     * @param array $classDefinitions
+     * @param array $definitions
      *
      * @return $this
      */
-    abstract function expand(array $classDefinitions);
+    abstract function expand(array $definitions);
 
     /**
      * @return string
      */
     abstract function getName();
+
+    /**
+     * @return string
+     */
+    abstract function getTemplate();
 
     /**
      * @param $name

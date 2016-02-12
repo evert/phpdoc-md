@@ -3,8 +3,9 @@
 namespace PHPDocMD;
 
 use Twig_Environment;
-use Twig_Loader_Filesystem;
 use Twig_SimpleFilter;
+use Twig_Loader_Filesystem;
+use PHPDocMD\Definitions\AbstractDefinition;
 
 /**
  * This class takes the output from 'parser', and generate the markdown
@@ -28,7 +29,7 @@ class Generator
      *
      * @var array
      */
-    static protected $classDefinitions;
+    protected static $classDefinitions;
 
     /**
      * Directory containing the twig templates.
@@ -42,7 +43,7 @@ class Generator
      *
      * @var string
      */
-    static protected $linkTemplate;
+    protected static $linkTemplate;
 
     /**
      * Filename for API Index.
@@ -83,7 +84,8 @@ class Generator
         $twig->addFilter($filter);
 
         foreach (self::$classDefinitions as $definition) {
-            $output = $twig->render('class.twig', ['definition' => $definition]);
+            /** @var AbstractDefinition $definition */
+            $output = $twig->render($definition->getTemplate(), ['definition' => $definition]);
 
             file_put_contents($this->outputDir . '/' . $definition->fileName, $output);
         }
