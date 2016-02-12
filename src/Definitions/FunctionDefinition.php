@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPDocMD\Definition;
+namespace PHPDocMD\Definitions;
 
 class FunctionDefinition extends AbstractDefinition
 {

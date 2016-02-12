@@ -4,7 +4,7 @@ namespace PHPDocMD;
 
 use RuntimeException;
 use SimpleXMLElement;
-use PHPDocMD\Definition\AbstractDefinition;
+use PHPDocMD\Definitions\AbstractDefinition;
 
 /**
  * This class parses structure.xml and generates the api documentation.
@@ -15,11 +15,11 @@ use PHPDocMD\Definition\AbstractDefinition;
  */
 class Parser
 {
-    const ABSTRACT_DEFINITION = '\PHPDocMD\Definition\AbstractDefinition';
+    const ABSTRACT_DEFINITION = '\PHPDocMD\Definitions\AbstractDefinition';
 
-    const CLASS_DEFINITION = '\PHPDocMD\Definition\ClassDefinition';
+    const CLASS_DEFINITION = '\PHPDocMD\Definitions\ClassDefinition';
 
-    const FUNCTION_DEFINITION = '\PHPDocMD\Definition\FunctionDefinition';
+    const FUNCTION_DEFINITION = '\PHPDocMD\Definitions\FunctionDefinition';
 
     /**
      * Path to the structure.xml file.
