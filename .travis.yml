@@ -26,4 +26,7 @@ before_script:
 script:
     - find Core -name "*.php" | xargs -n1 php -l 
     - ./bin/sabre-cs-fixer fix . --dry-run --diff
+    - php bin/phpdoc.php -d src -t docs-test/ --template="xml"
+    - mkdir output-test
+    - php bin/phpdocmd docs-test/structure.xml output-test/
 

@@ -85,10 +85,10 @@ class Generator
         $filter = new Twig_SimpleFilter('classLink', ['PHPDocMd\\Generator', 'classLink']);
         $twig->addFilter($filter);
 
-        foreach ($this->classDefinitions as $className => $data) {
-            $output = $twig->render('class.twig', $data);
+        foreach ($this->classDefinitions as $definition) {
+            $output = $twig->render('class.twig', ['definition' => $definition]);
 
-            file_put_contents($this->outputDir . '/' . $data['fileName'], $output);
+            file_put_contents($this->outputDir . '/' . $definition->fileName, $output);
         }
 
         $index = $this->createIndex();
@@ -115,7 +115,7 @@ class Generator
     {
         $tree = [];
 
-        foreach ($this->classDefinitions as $className => $classInfo) {
+        foreach ($this->classDefinitions as $className => $definition) {
             $current = & $tree;
 
             foreach (explode('\\', $className) as $part) {

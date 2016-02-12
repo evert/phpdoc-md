@@ -1,3 +1,5 @@
+docs-test/
+output-test/
 vendor/
 composer.lock
 .*.swp

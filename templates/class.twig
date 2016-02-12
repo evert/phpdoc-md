@@ -1,42 +1,41 @@
-{{ className }}
+{{ definition.className }}
 ===============
 
-{{ description }}
+{{ definition.description }}
 
-{{ longDescription|raw }}
+{{ definition.longDescription|raw }}
 
-{% if isClass %}
-
-* Class name: {{ shortClass }}
-* Namespace: {{ namespace }}
-{% if abstract %}* This is an **abstract** class
+{% if definition.isClass %}
+* Class name: {{ definition.shortClass }}
+* Namespace: {{ definition.namespace }}
+{% if definition.abstract %}* This is an **abstract** class
 {% endif %}
-{% if extends[0] %}* Parent class: {{ extends.0|classLink }}
+{% if definition.extends[0] %}* Parent class: {{ definition.extends.0|classLink }}
 {% endif %}
-{% if implements %}* This class implements: {% for interface in implements %}{{ interface|classLink }}{%if not loop.last %}, {% endif %}{% endfor %}
+{% if definition.implements %}* This class implements: {% for interface in definition.implements %}{{ interface|classLink }}{%if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
-{% if deprecated %}* **Warning:** this class is **deprecated**. This means that this class will likely be removed in a future version.
-{% endif %}
-
+{% if definition.deprecated %}* **Warning:** this class is **deprecated**. This means that this class will likely be removed in a future version.
 {% endif %}
 
-{% if isInterface %}
-* Interface name: {{ shortClass }}
-* Namespace: {{ namespace }}
+{% endif %}
+
+{% if definition.isInterface %}
+* Interface name: {{ definition.shortClass }}
+* Namespace: {{ definition.namespace }}
 * This is an **interface**
-{% if extends %}* This interface extends: {% for interface in extends %}{{ interface|classLink }}{%if not loop.last %}, {% endif %}{% endfor %}
+{% if definition.extends %}* This interface extends: {% for interface in definition.extends %}{{ interface|classLink }}{%if not loop.last %}, {% endif %}{% endfor %}
 {% endif %}
-{% if deprecated %}* **Warning:** this interface is **deprecated**. This means that this interface will likely be removed in a future version.
-{% endif %}
-
+{% if definition.deprecated %}* **Warning:** this interface is **deprecated**. This means that this interface will likely be removed in a future version.
 {% endif %}
 
-{% if constants %}
+{% endif %}
+
+{% if definition.constants %}
 Constants
 ----------
 {% endif %}
 
-{% for constant in constants %}
+{% for constant in definition.constants %}
 
 ### {{ constant.name }}
 
@@ -49,12 +48,12 @@ Constants
 
 {% endfor %}
 
-{% if properties %}
+{% if definition.properties %}
 Properties
 ----------
 {% endif %}
 
-{% for property in properties %}
+{% for property in definition.properties %}
 
 ### {{ property.name }}
 
@@ -72,12 +71,12 @@ Properties
 
 {% endfor %}
 
-{% if methods %}
+{% if definition.methods %}
 Methods
 -------
 {% endif %}
 
-{% for method in methods %}
+{% for method in definition.methods %}
 
 ### {{ method.name }}
 
