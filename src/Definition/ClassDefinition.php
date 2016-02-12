@@ -191,7 +191,7 @@ class ClassDefinition extends AbstractDefinition
                 $arguments[] = $nArgument;
             }
 
-            $argumentStr = implode(', ', array_map(function ($argument) {
+            $argumentStr = implode(', ', array_map(function($argument) {
                 $return = $argument['name'];
 
                 if ($argument['type']) {
