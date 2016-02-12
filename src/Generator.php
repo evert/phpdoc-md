@@ -28,7 +28,7 @@ class Generator
      *
      * @var array
      */
-    protected $classDefinitions;
+    static protected $classDefinitions;
 
     /**
      * Directory containing the twig templates.
@@ -42,7 +42,7 @@ class Generator
      *
      * @var string
      */
-    protected $linkTemplate;
+    static protected $linkTemplate;
 
     /**
      * Filename for API Index.
@@ -60,10 +60,10 @@ class Generator
      */
     function __construct(array $classDefinitions, $outputDir, $templateDir, $linkTemplate = '%c.md', $apiIndexFile = 'ApiIndex.md')
     {
-        $this->classDefinitions = $classDefinitions;
+        self::$classDefinitions = $classDefinitions;
         $this->outputDir = $outputDir;
         $this->templateDir = $templateDir;
-        $this->linkTemplate = $linkTemplate;
+        self::$linkTemplate = $linkTemplate;
         $this->apiIndexFile = $apiIndexFile;
     }
 
@@ -79,13 +79,10 @@ class Generator
 
         $twig = new Twig_Environment($loader);
 
-        $GLOBALS['PHPDocMD_classDefinitions'] = $this->classDefinitions;
-        $GLOBALS['PHPDocMD_linkTemplate'] = $this->linkTemplate;
-
         $filter = new Twig_SimpleFilter('classLink', ['PHPDocMd\\Generator', 'classLink']);
         $twig->addFilter($filter);
 
-        foreach ($this->classDefinitions as $definition) {
+        foreach (self::$classDefinitions as $definition) {
             $output = $twig->render('class.twig', ['definition' => $definition]);
 
             file_put_contents($this->outputDir . '/' . $definition->fileName, $output);
@@ -96,7 +93,7 @@ class Generator
         $index = $twig->render('index.twig',
             [
                 'index'            => $index,
-                'classDefinitions' => $this->classDefinitions,
+                'classDefinitions' => self::$classDefinitions,
             ]
         );
 
@@ -115,7 +112,7 @@ class Generator
     {
         $tree = [];
 
-        foreach ($this->classDefinitions as $className => $definition) {
+        foreach (self::$classDefinitions as $className => $definition) {
             $current = & $tree;
 
             foreach (explode('\\', $className) as $part) {
@@ -169,9 +166,6 @@ class Generator
      */
     static function classLink($className, $label = null)
     {
-        $classDefinitions = $GLOBALS['PHPDocMD_classDefinitions'];
-        $linkTemplate = $GLOBALS['PHPDocMD_linkTemplate'];
-
         $returnedClasses = [];
 
         foreach (explode('|', $className) as $oneClass) {
@@ -181,11 +175,11 @@ class Generator
                 $label = $oneClass;
             }
 
-            if (!isset($classDefinitions[$oneClass])) {
+            if (!isset(self::$classDefinitions[$oneClass])) {
                 $returnedClasses[] = $oneClass;
             } else {
                 $link = str_replace('\\', '-', $oneClass);
-                $link = strtr($linkTemplate, ['%c' => $link]);
+                $link = strtr(self::$linkTemplate, ['%c' => $link]);
 
                 $returnedClasses[] = sprintf("[%s](%s)", $label, $link);
             }
