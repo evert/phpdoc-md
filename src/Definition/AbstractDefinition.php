@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPDocMD;
+namespace PHPDocMD\Definition;
 
 use SimpleXmlElement;
 

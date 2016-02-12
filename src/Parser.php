@@ -4,6 +4,7 @@ namespace PHPDocMD;
 
 use RuntimeException;
 use SimpleXMLElement;
+use PHPDocMD\Definition\AbstractDefinition;
 
 /**
  * This class parses structure.xml and generates the api documentation.
@@ -14,6 +15,8 @@ use SimpleXMLElement;
  */
 class Parser
 {
+    const ABSTRACT_DEFINITION = '\PHPDocMD\Definition\AbstractDefinition';
+
     const CLASS_DEFINITION = '\PHPDocMD\Definition\ClassDefinition';
 
     const FUNCTION_DEFINITION = '\PHPDocMD\Definition\FunctionDefinition';
@@ -99,7 +102,7 @@ class Parser
      */
     protected function setupDefinitions($path, $className, $definitionString)
     {
-        $abstract = AbstractDefinition::class;
+        $abstract = self::ABSTRACT_DEFINITION;
         if (!in_array($abstract, class_parents($className))) {
             throw new RuntimeException("The definition class {$className} must extend the class {$abstract}");
         }

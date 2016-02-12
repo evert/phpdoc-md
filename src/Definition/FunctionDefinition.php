@@ -2,8 +2,6 @@
 
 namespace PHPDocMD\Definition;
 
-use PHPDocMD\AbstractDefinition;
-
 class FunctionDefinition extends AbstractDefinition
 {
 
