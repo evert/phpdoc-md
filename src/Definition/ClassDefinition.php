@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: eric
- * Date: 2/11/16
- * Time: 7:45 PM
- */
 
 namespace PHPDocMD\Definition;
 
@@ -210,15 +204,15 @@ class ClassDefinition extends AbstractDefinition
             $signature = sprintf('%s %s::%s(%s)', $return, $className, $methodName, $argumentStr);
 
             $methods[$methodName] = [
-                'name' => $methodName,
+                'name'        => $methodName,
                 'description' => (string)$method->docblock->description . "\n\n" . (string)$method->docblock->{'long-description'},
-                'visibility' => (string)$method['visibility'],
-                'abstract' => ((string)$method['abstract']) == "true",
-                'static' => ((string)$method['static']) == "true",
-                'deprecated' => count($this->xml->xpath('docblock/tag[@name="deprecated"]')) > 0,
-                'signature' => $signature,
-                'arguments' => $arguments,
-                'definedBy' => $className,
+                'visibility'  => (string)$method['visibility'],
+                'abstract'    => ((string)$method['abstract']) == "true",
+                'static'      => ((string)$method['static']) == "true",
+                'deprecated'  => count($this->xml->xpath('docblock/tag[@name="deprecated"]')) > 0,
+                'signature'   => $signature,
+                'arguments'   => $arguments,
+                'definedBy'   => $className,
             ];
         }
 
@@ -259,15 +253,15 @@ class ClassDefinition extends AbstractDefinition
             }
 
             $properties[$propName] = [
-                'name' => $propName,
-                'type' => $type,
-                'default' => $default,
+                'name'        => $propName,
+                'type'        => $type,
+                'default'     => $default,
                 'description' => (string)$xProperty->docblock->description . "\n\n" . (string)$xProperty->docblock->{'long-description'},
-                'visibility' => $visibility,
-                'static' => ((string)$xProperty['static']) == 'true',
-                'signature' => $signature,
-                'deprecated' => count($this->xml->xpath('docblock/tag[@name="deprecated"]')) > 0,
-                'definedBy' => $className,
+                'visibility'  => $visibility,
+                'static'      => ((string)$xProperty['static']) == 'true',
+                'signature'   => $signature,
+                'deprecated'  => count($this->xml->xpath('docblock/tag[@name="deprecated"]')) > 0,
+                'definedBy'   => $className,
             ];
         }
 
@@ -296,12 +290,12 @@ class ClassDefinition extends AbstractDefinition
             $signature = sprintf('const %s = %s', $name, $value);
 
             $constants[$name] = [
-                'name' => $name,
+                'name'        => $name,
                 'description' => (string)$xConstant->docblock->description . "\n\n" . (string)$xConstant->docblock->{'long-description'},
-                'signature' => $signature,
-                'value' => $value,
-                'deprecated' => count($this->xml->xpath('docblock/tag[@name="deprecated"]')) > 0,
-                'definedBy' => $className,
+                'signature'   => $signature,
+                'value'       => $value,
+                'deprecated'  => count($this->xml->xpath('docblock/tag[@name="deprecated"]')) > 0,
+                'definedBy'   => $className,
             ];
         }
 

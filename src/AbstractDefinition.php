@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: eric
- * Date: 2/11/16
- * Time: 7:40 PM
- */
 
 namespace PHPDocMD;
 

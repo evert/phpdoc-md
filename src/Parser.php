@@ -113,7 +113,7 @@ class Parser
             $names[$definition->getName()] = $definition;
         }
 
-        $this->{$definitionString} = array_map(function (AbstractDefinition $class) use ($names) {
+        $this->{$definitionString} = array_map(function(AbstractDefinition $class) use ($names) {
             return $class->expand($names);
         }, $names);
 
