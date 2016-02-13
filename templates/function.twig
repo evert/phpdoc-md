@@ -1,0 +1,36 @@
+{{ definition.getName }}
+===============
+
+{{ definition.description }}
+
+{{ definition.longDescription|raw }}
+
+{% if definition.functions %}
+Functions
+-------
+{% endif %}
+
+{% for function in definition.functions %}
+
+### {{ function.name }}
+
+{{ function.signature|raw }}
+
+{{ function.description|raw }}
+
+{% if function.deprecated %}* **Warning:** this function is **deprecated**. This means that this method will likely be removed in a future version.
+{% endif %}
+{% if function.definedBy %}* This function is defined in {{ function.definedBy }}
+{% endif %}
+
+
+{% if function.arguments %}
+#### Arguments
+{% for argument in function.arguments %}
+* {{ argument.name }} **{% if argument.type %}{{ argument.type }}{% else %}mixed{% endif %}**{% if argument.description %} - {{ argument.description }}{% endif %}
+
+{% endfor %}
+
+{% endif %}
+
+{% endfor %}

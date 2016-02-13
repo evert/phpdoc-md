@@ -62,12 +62,13 @@ $parser = new PHPDocMD\Parser($input);
 
 echo "Parsing structure.xml\n";
 
-$classDefinitions = $parser->run();
+$parser->load();
+$parser->run();
 
 $templateDir = dirname(__DIR__) . '/templates/';
 
 $generator = new PHPDocMD\Generator(
-    $classDefinitions,
+    $parser,
     $outputDir,
     $templateDir,
     $named['lt'],

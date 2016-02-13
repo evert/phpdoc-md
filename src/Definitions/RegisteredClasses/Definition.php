@@ -1,74 +1,103 @@
 <?php
 
-namespace PHPDocMD\Definitions;
+namespace PHPDocMD\Definitions\RegisteredClasses;
+
+use PHPDocMD\Definitions\AbstractDefinition;
 
 /**
- * Maintains all the information for a single class or interface definition.
+ * Maintains all the information for a single class, interface or trait definition.
  *
  * @copyright Copyright (C) Evert Pot. All rights reserved.
  * @author    Evert Pot (https://evertpot.coom/)
+ * @author    Eric Dowell (https://ericdowell.com/)
  * @license   MIT
  */
-class ClassDefinition extends AbstractDefinition
+class Definition extends AbstractDefinition
 {
     /**
+     * The key that identify class, interface or trait in class collection.
+     *
      * @var string
      */
     public $className;
     /**
+     * The name of the class, interface or trait without namespacing prefixing.
+     *
      * @var string
      */
     public $shortClass;
     /**
+     * The namespace the class belongs to.
+     *
      * @var string
      */
     public $namespace;
     /**
-     * @var string
-     */
-    public $description;
-    /**
-     * @var string
-     */
-    public $longDescription;
-    /**
+     * The interfaces the class or interface implements
+     *
      * @var array
      */
     public $implements = [];
     /**
+     * The classes the class extends.
+     *
      * @var array
      */
     public $extends = [];
     /**
+     * The traits the class inherits.
+     *
+     * @todo: add logic to link inheritance from traits.
+     *
+     * @var array
+     */
+    public $traits = [];
+    /**
+     * Indicates if definition is a class.
+     *
      * @var bool
      */
     public $isClass;
     /**
+     * Indicates if definition is a interface.
+     *
      * @var bool
      */
     public $isInterface;
     /**
+     * Indicates if definition is an abstract class.
+     *
      * @var bool
      */
     public $abstract;
     /**
+     * Indicates if definition is deprecated.
+     *
      * @var bool
      */
     public $deprecated;
     /**
+     * List of methods that are defined on the class, interface or trait.
+     *
      * @var array
      */
     public $methods;
     /**
+     * List of properties defined on class or trait.
+     *
      * @var array
      */
     public $properties;
     /**
+     * List of constants defined on class or trait.
+     *
      * @var array
      */
     public $constants;
 
     /**
+     * Returns the name of the class, interface or trait.
+     *
      * @return string
      */
     function getName()
@@ -77,6 +106,8 @@ class ClassDefinition extends AbstractDefinition
     }
 
     /**
+     * Returns the class, interface or trait template for rendering.
+     *
      * @return string
      */
     function getTemplate()
@@ -85,6 +116,8 @@ class ClassDefinition extends AbstractDefinition
     }
 
     /**
+     * Parses all the information for a single class, interface or trait.
+     *
      * @return $this
      */
     function parse()
@@ -130,23 +163,7 @@ class ClassDefinition extends AbstractDefinition
     }
 
     /**
-     * @param array $definitions
-     *
-     * @return $this
-     */
-    function expand(array $definitions)
-    {
-        $this->expandMethods($definitions, $this->getName());
-        $this->expandProperties($definitions, $this->getName());
-
-        return $this;
-    }
-
-    /**
-     * Parses all the method information for a single class or interface.
-     *
-     * You must pass an xml element that refers to either the class or interface element from
-     * structure.xml.
+     * Parses all the method information for a single class, interface or trait.
      *
      * @return array
      */
@@ -154,61 +171,16 @@ class ClassDefinition extends AbstractDefinition
     {
         $methods = [];
 
-        $className = (string)$this->xml->full_name;
-        $className = ltrim($className, '\\');
+        $className = ltrim($this->parseFullName($this->xml), '\\');
 
         foreach ($this->xml->method as $method) {
-            $methodName = (string)$method->name;
+            $methodName = $this->parseDocName($method);
 
-            $return = $method->xpath('docblock/tag[@name="return"]');
+            $return = $this->parseDocReturn($method);
 
-            if (count($return)) {
-                $return = (string)$return[0]['type'];
-            }
-            else {
-                $return = 'mixed';
-            }
+            $arguments = $this->parseDocArguments($method);
 
-            $arguments = [];
-
-            foreach ($method->argument as $argument) {
-                $nArgument = [
-                    'type' => (string)$argument->type,
-                    'name' => (string)$argument->name,
-                ];
-
-                $tags = $method->xpath(
-                    sprintf('docblock/tag[@name="param" and @variable="%s"]', $nArgument['name'])
-                );
-
-                if (count($tags)) {
-                    $tag = $tags[0];
-
-                    if ((string)$tag['type']) {
-                        $nArgument['type'] = (string)$tag['type'];
-                    }
-
-                    if ((string)$tag['description']) {
-                        $nArgument['description'] = (string)$tag['description'];
-                    }
-
-                    if ((string)$tag['variable']) {
-                        $nArgument['name'] = (string)$tag['variable'];
-                    }
-                }
-
-                $arguments[] = $nArgument;
-            }
-
-            $argumentStr = implode(', ', array_map(function($argument) {
-                $return = $argument['name'];
-
-                if ($argument['type']) {
-                    $return = $argument['type'] . ' ' . $return;
-                }
-
-                return $return;
-            }, $arguments));
+            $argumentStr = $this->docArgumentsToStr($arguments);
 
             $signature = sprintf('%s %s::%s(%s)', $return, $className, $methodName, $argumentStr);
 
@@ -229,10 +201,7 @@ class ClassDefinition extends AbstractDefinition
     }
 
     /**
-     * Parses all property information for a single class or interface.
-     *
-     * You must pass an xml element that refers to either the class or interface element from
-     * structure.xml.
+     * Parses all property information for a single class, interface or trait.
      *
      * @return array
      */
@@ -278,10 +247,7 @@ class ClassDefinition extends AbstractDefinition
     }
 
     /**
-     * Parses all constant information for a single class or interface.
-     *
-     * You must pass an xml element that refers to either the class or interface element from
-     * structure.xml.
+     * Parses all constant information for a single class, interface or trait.
      *
      * @return array
      */
@@ -309,74 +275,5 @@ class ClassDefinition extends AbstractDefinition
         }
 
         return $constants;
-    }
-
-    /**
-     * This method goes through all the class definitions, and adds non-overridden method
-     * information from parent classes.
-     *
-     * @param array  $classDefinitions
-     * @param string $className
-     *
-     * @return array
-     */
-    protected function expandMethods(array $classDefinitions, $className)
-    {
-        $class = $classDefinitions[$className];
-        $newMethods = [];
-        foreach (array_merge($class->extends, $class->implements) as $extends) {
-            if (!isset($classDefinitions[$extends])) {
-                continue;
-            }
-            foreach ($classDefinitions[$extends]->methods as $methodName => $methodInfo) {
-                if (!isset($class->{$methodName})) {
-                    $newMethods[$methodName] = $methodInfo;
-                }
-            }
-            $newMethods = array_merge($newMethods, $this->expandMethods($classDefinitions, $extends));
-        }
-
-        $this->methods = array_merge(
-            $this->methods,
-            $newMethods
-        );
-
-        return $newMethods;
-    }
-
-    /**
-     * This method goes through all the class definitions, and adds non-overridden property
-     * information from parent classes.
-     *
-     * @param array  $classDefinitions
-     * @param string $className
-     *
-     * @return array
-     */
-    protected function expandProperties(array $classDefinitions, $className)
-    {
-        $class = $classDefinitions[$className];
-
-        $newProperties = [];
-
-        foreach (array_merge($class->implements, $class->extends) as $extends) {
-            if (!isset($classDefinitions[$extends])) {
-                continue;
-            }
-            foreach ($classDefinitions[$extends]->properties as $propertyName => $propertyInfo) {
-                if ($propertyInfo['visibility'] === 'private') {
-                    continue;
-                }
-                if (!isset($class->{$propertyName})) {
-                    $newProperties[$propertyName] = $propertyInfo;
-                }
-            }
-
-            $newProperties = array_merge($newProperties, $this->expandProperties($classDefinitions, $extends));
-        }
-
-        $this->properties += $newProperties;
-
-        return $newProperties;
     }
 }
