@@ -2,8 +2,19 @@
 
 namespace PHPDocMD\Definitions;
 
+/**
+ * Maintains all the information for a single function definition.
+ *
+ * @copyright Copyright (C) Eric Dowell. All rights reserved.
+ * @author    Eric Dowell (https://ericdowell.com/)
+ * @license   MIT
+ */
 class FunctionDefinition extends AbstractDefinition
 {
+    /**
+     * @var string
+     */
+    public $functionName;
 
     /**
      * @return string

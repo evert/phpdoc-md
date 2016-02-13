@@ -2,12 +2,15 @@
 
 namespace PHPDocMD\Definitions;
 
+/**
+ * Maintains all the information for a single class or interface definition.
+ *
+ * @copyright Copyright (C) Evert Pot. All rights reserved.
+ * @author    Evert Pot (https://evertpot.coom/)
+ * @license   MIT
+ */
 class ClassDefinition extends AbstractDefinition
 {
-    /***
-     * @var string
-     */
-    public $fileName;
     /**
      * @var string
      */

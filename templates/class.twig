@@ -6,6 +6,7 @@
 {{ definition.longDescription|raw }}
 
 {% if definition.isClass %}
+
 * Class name: {{ definition.shortClass }}
 * Namespace: {{ definition.namespace }}
 {% if definition.abstract %}* This is an **abstract** class
@@ -66,7 +67,7 @@ Properties
 {% endif %}
 {% if property.static %}* This property is **static**.
 {% endif %}
-{% if property.definedBy != className %}* This property is defined by {{ property.definedBy|classLink }}
+{% if property.definedBy != definition.className %}* This property is defined by {{ property.definedBy|classLink }}
 {% endif %}
 
 {% endfor %}
@@ -91,7 +92,7 @@ Methods
 {% endif %}
 {% if method.deprecated %}* **Warning:** this method is **deprecated**. This means that this method will likely be removed in a future version.
 {% endif %}
-{% if method.definedBy != className %}* This method is defined by {{ method.definedBy|classLink }}
+{% if method.definedBy != definition.className %}* This method is defined by {{ method.definedBy|classLink }}
 {% endif %}
 
 

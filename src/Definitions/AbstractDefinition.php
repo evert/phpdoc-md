@@ -4,8 +4,20 @@ namespace PHPDocMD\Definitions;
 
 use SimpleXmlElement;
 
+/**
+ * The base contract for any given definition.
+ *
+ * @copyright Copyright (C) Eric Dowell. All rights reserved.
+ * @author    Eric Dowell (https://ericdowell.com/)
+ * @license   MIT
+ */
 abstract class AbstractDefinition
 {
+    /***
+     * @var string
+     */
+    public $fileName;
+
     /**
      * @var SimpleXmlElement
      */
