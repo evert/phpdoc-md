@@ -2,32 +2,57 @@
 
 namespace PHPDocMD;
 
+use RuntimeException;
 use SimpleXMLElement;
+use PHPDocMD\Definitions\RegisteredClasses\Collection as ClassCollection;
+use PHPDocMD\Definitions\RegisteredFunctions\Collection as FunctionCollection;
 
 /**
- * This class parses structure.xml and generates the api documentation.
+ * This class parses structure.xml and generates the collection(s) for api documentation.
  *
  * @copyright Copyright (C) Evert Pot. All rights reserved.
  * @author    Evert Pot (https://evertpot.coom/)
+ * @author    Eric Dowell (https://ericdowell.com/)
  * @license   MIT
  */
 class Parser
 {
+    /**
+     * The collection used to parse and expand class/interface/trait definitions.
+     */
+    const CLASS_COLLECTION = 'PHPDocMD\Definitions\RegisteredClasses\Collection';
+    /**
+     * The collection used to parse function definitions.
+     */
+    const FUNCTION_COLLECTION = 'PHPDocMD\Definitions\RegisteredFunctions\Collection';
     /**
      * Path to the structure.xml file.
      *
      * @var string
      */
     protected $structureXmlFile;
-
+    /**
+     * The structure.xml file parsed into SimpleXMLElement.
+     *
+     * @var SimpleXMLElement
+     */
+    protected $structureXml;
     /**
      * The list of classes and interfaces.
      *
-     * @var array
+     * @var ClassCollection
      */
     protected $classDefinitions;
+    /**
+     * The list of functions.
+     *
+     * @var FunctionCollection
+     */
+    protected $functionDefinitions;
 
     /**
+     * One entry point where the structureXmlFile can be set
+     *
      * @param string $structureXmlFile
      */
     function __construct($structureXmlFile)
@@ -37,318 +62,107 @@ class Parser
 
     /**
      * Starts the process.
+     *
+     * @return array
      */
     function run()
     {
-        $xml = simplexml_load_file($this->structureXmlFile);
+        $this->classDefinitions();
+        $this->functionDefinitions();
 
-        $this->getClassDefinitions($xml);
-
-        foreach ($this->classDefinitions as $className => $classInfo) {
-            $this->expandMethods($className);
-            $this->expandProperties($className);
-        }
-
-        return $this->classDefinitions;
+        return $this->classDefinitions()->all();
     }
 
     /**
-     * Gets all classes and interfaces from the file and puts them in an easy to use array.
+     * Parses the structure.xml file into a SimpleXMLElement object.
      *
-     * @param SimpleXmlElement $xml
+     * @param null|string $structureXmlFile
+     *
+     * @return $this
      */
-    protected function getClassDefinitions(SimpleXmlElement $xml)
+    function load($structureXmlFile = null)
     {
-        $classNames = [];
-
-        foreach ($xml->xpath('file/class|file/interface') as $class) {
-            $className = (string)$class->full_name;
-            $className = ltrim($className, '\\');
-
-            $fileName = str_replace('\\', '-', $className) . '.md';
-
-            $implements = [];
-
-            if (isset($class->implements)) {
-                foreach ($class->implements as $interface) {
-                    $implements[] = ltrim((string)$interface, '\\');
-                }
-            }
-
-            $extends = [];
-
-            if (isset($class->extends)) {
-                foreach ($class->extends as $parent) {
-                    $extends[] = ltrim((string)$parent, '\\');
-                }
-            }
-
-            $classNames[$className] = [
-                'fileName'        => $fileName,
-                'className'       => $className,
-                'shortClass'      => (string)$class->name,
-                'namespace'       => (string)$class['namespace'],
-                'description'     => (string)$class->docblock->description,
-                'longDescription' => (string)$class->docblock->{'long-description'},
-                'implements'      => $implements,
-                'extends'         => $extends,
-                'isClass'         => $class->getName() === 'class',
-                'isInterface'     => $class->getName() === 'interface',
-                'abstract'        => (string)$class['abstract'] == 'true',
-                'deprecated'      => count($class->xpath('docblock/tag[@name="deprecated"]')) > 0,
-                'methods'         => $this->parseMethods($class),
-                'properties'      => $this->parseProperties($class),
-                'constants'       => $this->parseConstants($class),
-            ];
+        if ($structureXmlFile) {
+            $this->structureXmlFile = $structureXmlFile;
         }
 
-        $this->classDefinitions = $classNames;
+        $this->structureXml = simplexml_load_file($this->structureXmlFile);
+
+        return $this;
     }
 
     /**
-     * Parses all the method information for a single class or interface.
+     * Returns the parsed structure.xml as SimpleXMLElement object.
      *
-     * You must pass an xml element that refers to either the class or interface element from
-     * structure.xml.
-     *
-     * @param SimpleXMLElement $class
+     * @return SimpleXMLElement
+     */
+    function xml()
+    {
+        if ($this->structureXml instanceof SimpleXMLElement) {
+            return $this->structureXml;
+        }
+
+        return $this->load();
+    }
+
+    /**
+     * Returns an array of all types of definitions.
      *
      * @return array
      */
-    protected function parseMethods(SimpleXMLElement $class)
+    function definitions()
     {
-        $methods = [];
-
-        $className = (string)$class->full_name;
-        $className = ltrim($className, '\\');
-
-        foreach ($class->method as $method) {
-            $methodName = (string)$method->name;
-
-            $return = $method->xpath('docblock/tag[@name="return"]');
-
-            if (count($return)) {
-                $return = (string)$return[0]['type'];
-            } else {
-                $return = 'mixed';
-            }
-
-            $arguments = [];
-
-            foreach ($method->argument as $argument) {
-                $nArgument = [
-                    'type' => (string)$argument->type,
-                    'name' => (string)$argument->name
-                ];
-
-                $tags = $method->xpath(
-                    sprintf('docblock/tag[@name="param" and @variable="%s"]', $nArgument['name'])
-                );
-
-                if (count($tags)) {
-                    $tag = $tags[0];
-
-                    if ((string)$tag['type']) {
-                        $nArgument['type'] = (string)$tag['type'];
-                    }
-
-                    if ((string)$tag['description']) {
-                        $nArgument['description'] = (string)$tag['description'];
-                    }
-
-                    if ((string)$tag['variable']) {
-                        $nArgument['name'] = (string)$tag['variable'];
-                    }
-                }
-
-                $arguments[] = $nArgument;
-            }
-
-            $argumentStr = implode(', ', array_map(function($argument) {
-                $return = $argument['name'];
-
-                if ($argument['type']) {
-                    $return = $argument['type'] . ' ' . $return;
-                }
-
-                return $return;
-            }, $arguments));
-
-            $signature = sprintf('%s %s::%s(%s)', $return, $className, $methodName, $argumentStr);
-
-            $methods[$methodName] = [
-                'name'        => $methodName,
-                'description' => (string)$method->docblock->description . "\n\n" . (string)$method->docblock->{'long-description'},
-                'visibility'  => (string)$method['visibility'],
-                'abstract'    => ((string)$method['abstract']) == "true",
-                'static'      => ((string)$method['static']) == "true",
-                'deprecated'  => count($class->xpath('docblock/tag[@name="deprecated"]')) > 0,
-                'signature'   => $signature,
-                'arguments'   => $arguments,
-                'definedBy'   => $className,
-            ];
-        }
-
-        return $methods;
+        return array_merge($this->classDefinitions()->all(), $this->functionDefinitions()->all());
     }
 
     /**
-     * Parses all property information for a single class or interface.
+     * Returns the collection containing all the class definitions.
      *
-     * You must pass an xml element that refers to either the class or interface element from
-     * structure.xml.
-     *
-     * @param SimpleXMLElement $class
-     *
-     * @return array
+     * @return ClassCollection
      */
-    protected function parseProperties(SimpleXMLElement $class)
+    function classDefinitions()
     {
-        $properties = [];
-
-        $className = (string)$class->full_name;
-        $className = ltrim($className, '\\');
-
-        foreach ($class->property as $xProperty) {
-            $type = 'mixed';
-            $propName = (string)$xProperty->name;
-            $default = (string)$xProperty->default;
-
-            $xVar = $xProperty->xpath('docblock/tag[@name="var"]');
-
-            if (count($xVar)) {
-                $type = $xVar[0]->type;
-            }
-
-            $visibility = (string)$xProperty['visibility'];
-            $signature = sprintf('%s %s %s', $visibility, $type, $propName);
-
-            if ($default) {
-                $signature .= ' = ' . $default;
-            }
-
-            $properties[$propName] = [
-                'name'        => $propName,
-                'type'        => $type,
-                'default'     => $default,
-                'description' => (string)$xProperty->docblock->description . "\n\n" . (string)$xProperty->docblock->{'long-description'},
-                'visibility'  => $visibility,
-                'static'      => ((string)$xProperty['static']) == 'true',
-                'signature'   => $signature,
-                'deprecated'  => count($class->xpath('docblock/tag[@name="deprecated"]')) > 0,
-                'definedBy'   => $className,
-            ];
+        if ($this->classDefinitions instanceof ClassCollection) {
+            return $this->classDefinitions;
         }
 
-        return $properties;
+        return $this->classDefinitions = forward_static_call([$this->definitionClass(), 'parse'], $this->xml());
     }
 
     /**
-     * Parses all constant information for a single class or interface.
+     * Returns the collection containing all the function definitions.
      *
-     * You must pass an xml element that refers to either the class or interface element from
-     * structure.xml.
-     *
-     * @param SimpleXMLElement $class
-     *
-     * @return array
+     * @return FunctionCollection
      */
-    protected function parseConstants(SimpleXMLElement $class)
+    function functionDefinitions()
     {
-        $constants = [];
-
-        $className = (string)$class->full_name;
-        $className = ltrim($className, '\\');
-
-        foreach ($class->constant as $xConstant) {
-            $name = (string)$xConstant->name;
-            $value = (string)$xConstant->value;
-
-            $signature = sprintf('const %s = %s', $name, $value);
-
-            $constants[$name] = [
-                'name'        => $name,
-                'description' => (string)$xConstant->docblock->description . "\n\n" . (string)$xConstant->docblock->{'long-description'},
-                'signature'   => $signature,
-                'value'       => $value,
-                'deprecated'  => count($class->xpath('docblock/tag[@name="deprecated"]')) > 0,
-                'definedBy'   => $className,
-            ];
+        if ($this->functionDefinitions instanceof FunctionCollection) {
+            return $this->functionDefinitions;
         }
 
-        return $constants;
+        return $this->functionDefinitions = forward_static_call([$this->definitionClass(true), 'parse'], $this->xml());
     }
 
     /**
-     * This method goes through all the class definitions, and adds non-overridden method
-     * information from parent classes.
+     * Validates the definition collection, making sure it inherits from the correct base parent collection.
      *
-     * @param string $className
+     * @param bool $function
      *
-     * @return array
+     * @return string
+     *
+     * @throws RuntimeException
      */
-    protected function expandMethods($className)
+    final protected function definitionClass($function = false)
     {
-        $class = $this->classDefinitions[$className];
+        $collection = ($function) ? 'FUNCTION_COLLECTION' : 'CLASS_COLLECTION';
 
-        $newMethods = [];
+        $className = constant("static::$collection");
+        $baseClass = constant("self::$collection");
 
-        foreach (array_merge($class['extends'], $class['implements']) as $extends) {
-            if (!isset($this->classDefinitions[$extends])) {
-                continue;
-            }
-
-            foreach ($this->classDefinitions[$extends]['methods'] as $methodName => $methodInfo) {
-                if (!isset($class[$methodName])) {
-                    $newMethods[$methodName] = $methodInfo;
-                }
-            }
-
-            $newMethods = array_merge($newMethods, $this->expandMethods($extends));
+        if ($className !== $baseClass && !in_array($baseClass, class_parents($className))) {
+            throw new RuntimeException("The collection class {$className} must extend the class {$baseClass}");
         }
 
-        $this->classDefinitions[$className]['methods'] = array_merge(
-            $this->classDefinitions[$className]['methods'],
-            $newMethods
-        );
-
-        return $newMethods;
-    }
-
-    /**
-     * This method goes through all the class definitions, and adds non-overridden property
-     * information from parent classes.
-     *
-     * @param string $className
-     *
-     * @return array
-     */
-    protected function expandProperties($className)
-    {
-        $class = $this->classDefinitions[$className];
-
-        $newProperties = [];
-
-        foreach (array_merge($class['implements'], $class['extends']) as $extends) {
-            if (!isset($this->classDefinitions[$extends])) {
-                continue;
-            }
-
-            foreach ($this->classDefinitions[$extends]['properties'] as $propertyName => $propertyInfo) {
-                if ($propertyInfo['visibility'] === 'private') {
-                    continue;
-                }
-
-                if (!isset($class[$propertyName])) {
-                    $newProperties[$propertyName] = $propertyInfo;
-                }
-            }
-
-            $newProperties = array_merge($newProperties, $this->expandProperties($extends));
-        }
-
-        $this->classDefinitions[$className]['properties'] += $newProperties;
-
-        return $newProperties;
+        return $className;
     }
 }
