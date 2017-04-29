@@ -72,10 +72,7 @@ class Generator
      */
     function run()
     {
-        $loader = new Twig_Loader_Filesystem($this->templateDir, [
-            'cache' => false,
-            'debug' => true,
-        ]);
+        $loader = new Twig_Loader_Filesystem($this->templateDir);
 
         $twig = new Twig_Environment($loader);
 
