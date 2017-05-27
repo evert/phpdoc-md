@@ -1,0 +1,42 @@
+{# Rainer Stötter 04-24-2017 #}Method {{ name }}( )
+-----
+```
+{% if deprecated %} deprecated {% endif %} {{ visibility }} {% if abstract %} abstract {% endif %}{% if static %} static {% endif %}  {{ signature|raw }}
+```
+* Namespace : {{ namespace }}
+* Class name: [{{ shortClass }}]({{namespace}}-{{shortClass}})
+{% if abstract %}* This is an **abstract** method
+{% endif %}
+{% if deprecated %}* **Warning:** this method is **deprecated**. This means that this method will likely be removed in a future version.
+{% endif %}
+{% if definedBy != className %}* This method is defined by {{ definedBy|classLink }}
+{% endif %}
+
+{{ description }}
+
+{{ longDescription|raw }}
+
+{% if arguments %}
+#### Arguments
+{% for argument in arguments %}
+* {{ argument.name }} **{% if argument.type %}{{ argument.type|classLink }}{% else %}mixed{% endif %}**{% if argument.description %} - {{ argument.description }}{% endif %}
+
+{% endfor %}
+{% endif %}
+
+
+{% if returns %}
+#### Returns
+    {{ returns.type }} {{ returns.description }}
+
+{% endif %}
+
+{% if see %}
+See also
+----------
+{% endif %}
+
+
+{% for entry in see %}
+- [[{{ entry }}]]
+{% endfor %}

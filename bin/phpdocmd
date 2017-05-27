@@ -1,6 +1,22 @@
 #!/usr/bin/env php
 <?php
 
+/*
+
+changes made by Rainer Stötter
+
+- xml contents as property $m_xml
+- additional command line parameter --sort
+- additional command line parameter --level component
+- additional command line parameter --level class
+- additional command line parameter --protected-off
+- additional command line parameter --private-off
+- additional command line parameter --public-off
+
+*/
+
+
+
 /**
  * Possible Composer autoload paths.
  */
@@ -33,16 +49,40 @@ $positional = array();
 $named = array(
     'lt' => '%c.md',
     'index' => 'ApiIndex.md',
+    'sort' => false,
+    'level' => 'class',
+    'protected-off' => false,
+    'private-off' => false,
+    'public-off' => false,
+    'sort-index' => false,
+    'sort-see' => false
 );
 
 for ($i = 0; $i < count($arguments); $i++) {
+
     if (substr($arguments[$i], 0, 2) === '--') {
-        $named[substr($arguments[$i], 2)] = $arguments[$i + 1];
-        $i++;
+
+	$arg = substr( $arguments[ $i ], 2 );
+	if ( $arg == 'sort-index' ) {
+	    $named[ $arg ] = true;
+	} elseif ( $arg == 'sort-see' ) {
+	    $named[ $arg ] = true;
+	} elseif ( $arg == 'protected-off' ) {
+	    $named[ $arg ] = true;
+	} elseif ( $arg == 'private-off' ) {
+	    $named[ $arg ] = true;
+	} elseif ( $arg == 'public-off' ) {
+	    $named[ $arg ] = true;
+	} else {
+	    $named[ $arg ] = $arguments[$i + 1];
+	    $i++;
+	}
     } else {
         $positional[] = $arguments[$i];
     }
 }
+
+
 
 if (count($positional) < 1) {
     include(__DIR__ . '/../src/usage.inc.php');
@@ -58,9 +98,16 @@ if (isset($positional[1])) {
     $outputDir = $positional[1];
 }
 
-$parser = new PHPDocMD\Parser($input);
+$parser = new PHPDocMD\Parser(
+    $input,
+    $named['sort-index'],
+    $named['sort-see'],
+    $named['protected-off'],
+    $named['private-off'],
+    $named['public-off']
+);
 
-echo "Parsing structure.xml\n";
+echo "\n Parsing structure.xml\n";
 
 $classDefinitions = $parser->run();
 
@@ -71,11 +118,13 @@ $generator = new PHPDocMD\Generator(
     $outputDir,
     $templateDir,
     $named['lt'],
-    $named['index']
+    $named['index'],
+    $named['sort-index'],
+    $named['level']
 );
 
-echo "Generating pages\n";
+echo "\n Generating pages\n";
 
 $generator->run();
 
-echo "Complete\n";
+echo "\n Complete\n";

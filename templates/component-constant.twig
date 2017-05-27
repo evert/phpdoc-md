@@ -1,0 +1,24 @@
+{# Rainer Stötter 04-24-2017 #}Constant {{ name }}
+===============
+{% if deprecated %} deprecated {% endif %} {{ visibility }} {% if abstract %} abstract {% endif %}{% if static %} static {% endif %}  {{ signature|raw }}
+
+* Namespace : {{ namespace }}
+* Class name: [{{ shortClass }}]({{namespace}}-{{shortClass}})
+{% if abstract %}* This is an **abstract** method
+{% endif %}
+{% if deprecated %}* **Warning:** this constant is **deprecated**. This means that this method will likely be removed in a future version.
+{% endif %}
+
+{{ description }}
+
+{{ longDescription|raw }}
+
+{% if see %}
+See also
+----------
+{% endif %}
+
+
+{% for entry in see %}
+- [[{{ entry }}]]
+{% endfor %}

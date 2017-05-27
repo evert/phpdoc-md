@@ -55,6 +55,19 @@ Options
         This specifies the 'filename' for API Index markdown file we're generating.
         By default this is "ApiIndex.md".
 
+    --sort-index
+        Sort the api index and the methods on class level
+    --sort-see
+        Sort the see also section
+    --level [ component | class ]
+        Component level: Generate a md file for each class component ( method / const ..).
+        Class level: generate a md file for each class
+        The default behaviour is the class level
+    --protected-off
+    --private-off
+    --public-off
+        Disables the output of protected / private /  public components
+
 This should generate all the .md files. I'm excited to hear your feedback.
 
 Cheers,

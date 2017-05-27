@@ -1,6 +1,13 @@
 ChangeLog
 =========
 
+* Added:--sort-index option (Sort the api index and the methods on class level) @rstoetter
+* Added:--sort-see option (Sort the see also section) @rstoetter
+* Added:--level option (Component level: Generate a md file for each class component ( method / const ..). Class level: generate a md file for each class) @rstoetter
+* Added:--protected-off option (Disables the output of protected components) @rstoetter
+* Added:--private-off option (Disables the output of private components) @rstoetter
+* Added:--public-off option (Disables the output of public components) @rstoetter
+
 0.2.0 (2016-02-11)
 ------------------
 
@@ -8,6 +15,7 @@ ChangeLog
 * #87: Now supports Twig 2.0. (@ericdowell)
 * #87: Added ability to override the 'ApiIndex.md' filename via the
   `--index` command line option. (@ericdowell)
+* Using php-cs-fixer and travis.
 
 
 0.1.1 (2015-03-26)
