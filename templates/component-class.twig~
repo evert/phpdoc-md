@@ -1,4 +1,4 @@
-{# className #}{{ namespace }}\{{ shortClass }}
+{# className #}{{ namespace }}\\{{ shortClass }}
 -------
 
 {% if isClass %}

@@ -1,6 +1,6 @@
 {# Rainer Stötter 04-24-2017 #}Constant {{ name }}
 ===============
-{% if deprecated %} deprecated {% endif %} {% if abstract %} abstract {% endif %}{% if static %} static {% endif %}  {{ signature|raw }}
+{% if deprecated %} deprecated {% endif %} {{ visibility }} {% if abstract %} abstract {% endif %}{% if static %} static {% endif %}  {{ signature|raw }}
 
 * Namespace : {{ namespace }}
 * Class name: [{{ shortClass }}]({{namespace|namespace2Link}}-{{shortClass}})

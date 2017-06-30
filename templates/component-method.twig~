@@ -14,6 +14,8 @@
 
 {{ description }}
 
+namespace {{namespace}} wird zu {{namespace|namespace2Link}}
+
 {{ longDescription|raw }}
 
 {% if arguments %}
