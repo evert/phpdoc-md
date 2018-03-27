@@ -1,6 +1,6 @@
 ChangeLog
 =========
-
+* Added: if level==component, then the program creates an user reference (showing just the public components) and a developer reference (including public, protected and private components) @rstoetter
 * Added:--sort-index option (Sort the api index and the methods on class level) @rstoetter
 * Added:--sort-see option (Sort the see also section) @rstoetter
 * Added:--level option (Component level: Generate a md file for each class component ( method / const ..). Class level: generate a md file for each class) @rstoetter
