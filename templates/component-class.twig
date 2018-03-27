@@ -1,0 +1,110 @@
+{# className #}{{ namespace }}\{{ shortClass }} - of API Reference {{ prefix_api_file }}
+-------
+
+{% if isClass %}
+
+* Class name: {{ shortClass }}
+* Namespace: {{ namespace }}
+
+{% if abstract %}* This is an **abstract** class
+{% endif %}
+{% if extends[0] %}* Parent class: {{ extends.0|classLinkPrefixed }}
+{% endif %}
+{% if implements %}* This class implements: {% for interface in implements %}{{ interface|classLinkPrefixed }}{%if not loop.last %}, {% endif %}{% endfor %}
+{% endif %}
+{% if deprecated %}* **Warning:** this class is **deprecated**. This means that this class will likely be removed in a future version.
+{% endif %}
+{% endif %}
+{% if isInterface %}
+* Interface name: {{ shortClass }}
+* Namespace: {{ namespace }}
+* This is an **interface**
+{% if extends %}* This interface extends: {% for interface in extends %}{{ interface|classLinkPrefixed }}{%if not loop.last %}, {% endif %}{% endfor %}
+{% endif %}
+{% if deprecated %}* **Warning:** this interface is **deprecated**. This means that this interface will likely be removed in a future version.
+{% endif %}
+{% endif %}
+
+{{ description }}
+
+{{ longDescription|raw }}
+
+
+{% if constants %}
+## constants of class {{ shortClass }}
+----------
+{% endif %}
+
+{% for constant in constants %}
+{% if constant.visibility  == "public" %}
+{% if render_public %}
+* {% if constant.deprecated %} deprecated {% endif %} {% if constant.static %} static {% endif %} {{ constant.visibility }} [{{ shortClass }}::{{ constant.name }}]({{ prefix_class_link }}{{ constant.name|rawurlencode }})
+{% endif %}
+{% elseif constant.visibility  == "protected" %}
+{% if render_protected %}
+* {% if constant.deprecated %} deprecated {% endif %} {% if constant.static %} static {% endif %} {{ constant.visibility }} [{{ shortClass }}::{{ constant.name }}]({{ prefix_class_link }}{{ constant.name|rawurlencode }})
+{% if constant.definedBy != className %}  * This constant is defined by {{ constant.definedBy|classLinkPrefixed }}{% endif %}
+{% endif %}
+{% elseif constant.visibility  == "private" %}
+{% if render_private %}
+* {% if constant.deprecated %} deprecated {% endif %} {% if constant.static %} static {% endif %} {{ constant.visibility }} [{{ shortClass }}::{{ constant.name }}]({{ prefix_class_link }}{{ constant.name|rawurlencode }})    
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{% if properties %}
+## properties of class {{ shortClass }}
+----------
+{% endif %}
+
+
+{% for property in properties %}
+{% if property.visibility  == "public" %}
+{% if render_public %}
+* {% if property.deprecated %} deprecated {% endif %} {% if property.static %} static {% endif %} {{ property.visibility }} [{{ shortClass }}::{{ property.name }}]({{ prefix_class_link }}{{ property.name|rawurlencode }})
+{% endif %}
+{% elseif property.visibility  == "protected" %}
+{% if render_protected %}
+* {% if property.deprecated %} deprecated {% endif %} {% if property.static %} static {% endif %} {{ property.visibility }} [{{ shortClass }}::{{ property.name }}]({{ prefix_class_link }}{{ property.name|rawurlencode }})
+{% endif %}
+{% elseif property.visibility  == "private" %}
+{% if render_private %}
+* {% if property.deprecated %} deprecated {% endif %} {% if property.static %} static {% endif %} {{ property.visibility }} [{{ shortClass }}::{{ property.name }}]({{ prefix_class_link }}{{ property.name|rawurlencode }})
+{% if property.definedBy != className %}  * This property is defined by {{ property.definedBy|classLinkPrefixed }}{% endif %}
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{% if methods %}
+## methods of class {{ shortClass }}
+-------
+{% endif %}
+
+{% for method in methods %}
+{% if method.visibility  == "public" %}
+{% if render_public %}
+* [{{ shortClass }}::{{ method.name }}()]({{ prefix_class_link }}{{ method.name|rawurlencode }}())
+{% if method.definedBy != className %}  * This method is defined by {{ method.definedBy|classLinkPrefixed }}{% endif %}
+```
+    {% if method.deprecated %} deprecated {% endif %} {% if method.abstract %} abstract {% endif %} {{ method.visibility }} {% if method.static %} static {% endif %} {{ method.signature|raw }}
+```
+{% endif %}
+{% elseif method.visibility  == "protected" %}
+{% if render_protected %}
+* [{{ shortClass }}::{{ method.name }}()]({{ prefix_class_link }}{{ method.name|rawurlencode }}())
+{% if method.definedBy != className %}  * This method is defined by {{ method.definedBy|classLinkPrefixed }}{% endif %}
+```
+    {% if method.deprecated %} deprecated {% endif %} {% if method.abstract %} abstract {% endif %} {{ method.visibility }} {% if method.static %} static {% endif %} {{ method.signature|raw }}
+```
+{% endif %}
+{% elseif method.visibility  == "private" %}
+{% if render_private %}
+* [{{ shortClass }}::{{ method.name }}()]({{ prefix_class_link }}{{ method.name|rawurlencode }}())
+{% if method.definedBy != className %}  * This method is defined by {{ method.definedBy|classLinkPrefixed }}{% endif %}
+```
+    {% if method.deprecated %} deprecated {% endif %} {% if method.abstract %} abstract {% endif %} {{ method.visibility }} {% if method.static %} static {% endif %} {{ method.signature|raw }}
+```
+{% endif %}
+{% endif %}
+{% endfor %}
+{# Rainer Stötter 04-24-2017 #}

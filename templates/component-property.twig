@@ -1,0 +1,26 @@
+{# Rainer Stötter 04-24-2017 #}Property {{ name }}  - of API Reference {{ prefix_api_file }}
+===============
+{% if deprecated %} deprecated {% endif %}  {% if abstract %} abstract {% endif %}{% if static %} static {% endif %}  {{ signature|raw }}
+
+* Namespace : {{ namespace }}
+* Class name: [{{ shortClass }}]({{ shortClassPrefixed }})
+{% if abstract %}* This is an **abstract** method
+{% endif %}
+{% if deprecated %}* **Warning:** this constant is **deprecated**. This means that this method will likely be removed in a future version.
+{% endif %}
+{% if definedBy != className %}* This property is defined by the class {{ definedBy }}
+{% endif %}
+
+{{ description }}
+
+{{ longDescription|raw }}
+
+{% if see %}
+See also
+----------
+{% endif %}
+
+
+{% for entry in see %}
+- [[{{ entry }}]]({{ prefix_class_link }}{{ entry }})
+{% endfor %}

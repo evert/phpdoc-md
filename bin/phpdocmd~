@@ -68,11 +68,11 @@ for ($i = 0; $i < count($arguments); $i++) {
 	} elseif ( $arg == 'sort-see' ) {
 	    $named[ $arg ] = true;
 	} elseif ( $arg == 'protected-off' ) {
-	    $named[ $arg ] = true;
+	    $named[ $arg ] = false;
 	} elseif ( $arg == 'private-off' ) {
-	    $named[ $arg ] = true;
+	    $named[ $arg ] = false;
 	} elseif ( $arg == 'public-off' ) {
-	    $named[ $arg ] = true;
+	    $named[ $arg ] = false;
 	} else {
 	    $named[ $arg ] = $arguments[$i + 1];
 	    $i++;
