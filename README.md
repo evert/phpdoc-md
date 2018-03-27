@@ -63,6 +63,8 @@ Options
         Component level: Generate a md file for each class component ( method / const ..).
         Class level: generate a md file for each class
         The default behaviour is the class level
+	new : if level==component, then the program creates an user reference (showing just the public components) 
+        and a developer reference (including public, protected and private components)
     --protected-off
     --private-off
     --public-off
