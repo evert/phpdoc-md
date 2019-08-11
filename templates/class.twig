@@ -42,7 +42,7 @@ Constants
 
     {{ constant.signature|raw }}
 
-{{ property.description|raw }}
+{{ constant.description|raw }}
 
 {% if constant.deprecated %}* **Warning:** this constant is **deprecated**. This means that this constant will likely be removed in a future version.
 {% endif %}
@@ -99,7 +99,13 @@ Methods
 {% if method.arguments %}
 #### Arguments
 {% for argument in method.arguments %}
-* {{ argument.name }} **{% if argument.type %}{{ argument.type|classLink }}{% else %}mixed{% endif %}**{% if argument.description %} - {{ argument.description }}{% endif %}
+* {{ argument.name }} **{% if argument.type %}{{ argument.type|classLink }}{% else %}mixed{% endif %}**{% if argument.description %}{% if argument.description is iterable %}
+
+
+{% for block_ in argument.description %}
+{{ block_|raw }}
+
+{% endfor %}{% else %} - {{ argument.description|raw }}{% endif %}{% endif %}
 
 {% endfor %}
 
