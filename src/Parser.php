@@ -2,6 +2,7 @@
 
 namespace PHPDocMD;
 
+use League\HTMLToMarkdown\HtmlConverter;
 use SimpleXMLElement;
 
 /**
@@ -28,11 +29,23 @@ class Parser
     protected $classDefinitions;
 
     /**
+     * The HTML to Markdown converter.
+     *
+     * @var League\HTMLToMarkdown\HtmlConverter
+     */
+    protected $htmlConverter;
+
+    /**
      * @param string $structureXmlFile
      */
     function __construct($structureXmlFile)
     {
         $this->structureXmlFile = $structureXmlFile;
+
+        $this->htmlConverter = new HtmlConverter([
+            'hard_break' => true,
+            'strip_tags' => true,
+        ]);
     }
 
     /**
@@ -153,7 +166,7 @@ class Parser
                     }
 
                     if ((string)$tag['description']) {
-                        $nArgument['description'] = (string)$tag['description'];
+                        $nArgument['description'] = $this->escapeHtmlToMarkdownBlocks((string)$tag['description']);
                     }
 
                     if ((string)$tag['variable']) {
@@ -350,5 +363,46 @@ class Parser
         $this->classDefinitions[$className]['properties'] += $newProperties;
 
         return $newProperties;
+    }
+
+    /**
+     * Converts encoded HTML to Markdown and breaks multi Markdown blocks to
+     * string arrays of indented Markdown code.
+     *
+     * The former is required since PHPDocumentor encodes certain attributes to
+     * HTML while generating the XML structure.
+     *
+     * The latter is required to allow the Twig template to render blocks
+     * block-by-block. Currently, this method assumes that such blocks are under
+     * a top-level block: the block indentation it generates is hard-coded to 4
+     * spaces.
+     *
+     * @param string $escapedHtml
+     *        The escaped HTML, as encoded in structure.xml
+     *
+     * @return string|array
+     *         The Markdown code, as a string if it is a single block or an
+     *         array of strings containing indented blocks otherwise.
+     */
+    protected function escapeHtmlToMarkdownBlocks($escapedHtml)
+    {
+        $flags = ENT_QUOTES | ENT_HTML5;
+        $html = htmlspecialchars_decode($escapedHtml, ENT_QUOTES | ENT_HTML5);
+        $md = $this->htmlConverter->convert($html);
+        $blocks = explode("\n\n", $md);
+
+        if (count($blocks) == 1) {
+            return $blocks[0];
+        }
+
+        return array_map(function ($block) {
+            $lines = explode("\n", $block);
+
+            $lines = array_map(function ($line) {
+                return '    ' . $line;
+            }, $lines);
+
+            return implode("\n", $lines);
+        }, $blocks);
     }
 }
