@@ -395,10 +395,10 @@ class Parser
             return $blocks[0];
         }
 
-        return array_map(function ($block) {
+        return array_map(function($block) {
             $lines = explode("\n", $block);
 
-            $lines = array_map(function ($line) {
+            $lines = array_map(function($line) {
                 return '    ' . $line;
             }, $lines);
 
